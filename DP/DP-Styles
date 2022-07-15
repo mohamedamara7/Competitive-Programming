@@ -35,3 +35,69 @@ after pushing loop to a paremeter:
 return memo[idx][rem]=dp(idx+1,rem)+dp(idx,rem-coins[idx]);
 
 We reduce the complexity from O(idx*(max_coins)^2) to O(idx*max_coins).
+
+
+---Consecutive Ranges Style:
+If we have an array of integers or characters and we want to divide it to set of groups according to a certain criteria.
+For example abcdefgh the answer may be (abc)(d)(ef)(g)(h). The simple dp approach is to use 2 pointers for detirmining the start and the end for a certain interval
+and at each end we decide to expand the interval(adding a new element to it) or to stop it and begin a new one according to the given criteria.
+-Solutions to the pearl problem:
+1-
+int n,cnt[n],pr[n];
+int memo[][];
+int dp(int cur_idx,int last_idx)
+{
+    if(cur_idx==n)
+        return 0;
+    if(~memo[cur_idx][last_idx])
+        return memo[cur_idx][last_idx];
+    int sum=10;
+    for(int i=cur_idx;i<=last_idx;i++)
+        sum+=cnt[i];
+    //Enough interval
+    memo[cur_idx][last_idx]=dp(i+1,j+1)+sum*pr[cur_idx];
+    // Add me to current interval
+    if(cur_idx!=n-1)
+        memo[cur_idx][last_idx]=min(memo[cur_idx][last_idx],dp(i+1,j));
+    return memo[cur_idx][last_idx];
+}
+Time and space complexity of this solution are o(n^3),o(n^2). we can reduce the time complexity by using prefix sum o(1) instead of the loop ,so the complexity
+will be o(n^2).
+
+2-
+We can carry the sum of the previous interval but will this increase the complexity? no the new prameter depends only on the cur_idx and last_idx and it's constant
+for any combination of values for(cur_idx and last_idx) we name it inferenced variable. Is cur_weight in knapsack an inferenced? no for a certain idx its value
+may be different because we take or leave elements before the current idx.
+
+int n,cnt[n],pr[n];
+int memo[][];
+int dp(int cur_idx,int last_idx,int cur_sum=0)
+{
+    if(cur_idx==n)
+        return (cur_idx==last_idx)?0:1e9;
+    if(~memo[cur_idx][last_idx])
+        return memo[cur_idx][last_idx];
+    return memo[cur_idx][last_idx]=min(dp(cur_idx+1,cur_idx+1,0)+(cur_sum+cnt[cur_idx]+10)*pr[cur_idx],dp(cur_idx+1,last_idx,cur_sum+cnt[cur_idx]));
+}
+// Note that: previousSum is inferenced variable and equals SumRange(i, j). Then we don't memoize it.
+
+3-
+Pushing a parameter to loop, to decrease the space complexity. We will fix one pointer and make a loop to move the other one from the starting pointer until reaching 
+the end (or certain value according to the criteria).
+int n,cnt[n],pr[n];
+int memo[];
+int dp(int cur_idx)
+{
+    if(cur_idx==n)
+        return 0;
+    if(~memo[cur_idx][last_idx])
+        return memo[cur_idx];
+    int sum=0,mn=INT_MAX;
+    for(int j=cur_idx;j<n;j++)
+    {
+        sum+=cnt[cur_idx];
+        mn=min(mn,dp(j+1)+(10+sum)*pr[cur_idx]);
+    }
+    return memo[cur_idx]=mn;
+}
+Time and space complexity of this solution are o(n^2),o(n) efficient for memory.
