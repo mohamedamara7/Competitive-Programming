@@ -1,0 +1,35 @@
+MinMax or MaxMin problems. For example aggressive cows problem.
+If we need to find Max(Min(distance between 2 cows)). We can represent this equation to Min(distance between 2 cows)>=D which means that all the distances between 2 cows
+should be greater than D. We can make a BS over D and the okey is "Can we but m cows such that the distance between each 2 is greater than or equal mid?".
+
+class Solution {
+public:
+    bool okey(vector<int>& position, int mid,int m)
+    {
+        int cur=position[0],cows=1;
+        for(int i=1;i<position.size();i++)
+        {
+            if(position[i]-cur>=mid)
+            {
+                cows++;
+                if(cows==m)
+                    return true;
+                cur=position[i];
+            }
+        }
+        return false;
+    }
+    int maxDistance(vector<int>& position, int m) {
+        sort(position.begin(),position.end());
+        int l=0,r=position[position.size()-1]-position[0]+1,mid;
+        while(r>l+1)
+        {
+            mid=(l+r)/2;
+            if(okey(position,mid,m))
+                l=mid;
+            else
+                r=mid;
+        }
+        return l;
+    }
+};
