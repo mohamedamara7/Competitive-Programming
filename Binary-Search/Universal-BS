@@ -1,0 +1,29 @@
+If we need to do a BS search on an array of length=N. we always put l=-1, r=N and itirate over a condition r>l+1.
+
+-If the search space is FFFFTTTT and we need to find the last false and first true.
+while(r>l+1)
+{
+  mid=(l+r)/2;
+  if(okey(mid))
+    r=mid;
+  else
+    l=mid;
+}
+Notes:
+1- okey(mid) may be any condition like arr[mid]>=k.
+2- r will always point at the first true and l will always point at the last false.
+3- r will have values between 0-N. 0 if the search space is TTTT and N if the seach space is FFFF.
+
+-If the search space is TTTTFFFF and we need to find the last true and first false.
+while(r>l+1)
+{
+  mid=(l+r)/2;
+  if(okey(mid))
+    l=mid;
+  else
+    r=mid;
+}
+Notes:
+1- okey(mid) may be any condition like arr[mid]>=k.
+2- l will always point at the last true and r will always point at the first false.
+3- l will have values between 0-N. 0 if the search space is FFFF and N if the seach space is TTTT.
