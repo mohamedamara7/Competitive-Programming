@@ -1,0 +1,124 @@
+BFS can be used to find the shortest path for unweighted or equally weighted graph.
+
+1- Ordinary BFS:
+
+void bfs(int src,vector<vector<int>>& adjlist)
+{
+    queue<int> q;
+    q.push(src);
+    visited[src]=1;
+    while(!q.empty())
+    {
+        int cur_node=q.front();
+        cout<<cur_node<<" ";
+        q.pop();
+        for(int i=0;i<adjlist[cur_node].size();i++)
+            if(!visited[adjlist[cur_node][i]])
+            {
+                visited[adjlist[cur_node][i]]=1;
+                q.push(adjlist[cur_node][i]);
+            }
+    }
+}
+
+2- single source to multiple destinations BFS(With shortest pathes)
+
+vector<int> bfs(int src,vector<vector<int>>& adjlist)
+{
+    vector<int> len(adjlist.size(),INT_MAX);
+    queue<pair<int,int>> q;
+    q.push({src,0});
+    len[src]=0;
+    int cur_node,cur_depth;
+    while(!q.empty())
+    {
+        cur_node=q.front().first,cur_depth=q.front().second;
+        q.pop();
+        for(int i=0;i<adjlist[cur_node].size();i++)
+            if(len[adjlist[cur_node][i]]==INT_MAX)
+            {
+                q.push({adjlist[cur_node][i],cur_len+1});
+                len[adjlist[cur_node][i]]=cur_len+1;
+            }
+    }
+    return len; //cur_node is the furthest node from src with depth cur_depth
+}
+
+
+-Another implementation without pair and half memory for the queue.
+
+vector<int> bfs(int src,vector<vector<int>>& adjlist)
+{
+    vector<int> len(adjlist.size(),INT_MAX);
+    queue<int> q;
+    q.push(src);
+    len[src]=0;
+    int cur_node,cur_depth=0,sz=1;
+    while(!q.empty())
+    {
+        while(sz--)
+        {
+            cur_node=q.front();
+            q.pop();
+            for(int i=0;i<adjlist[cur_node].size();i++)
+                if(len[adjlist[cur_node][i]]==INT_MAX)
+                {
+                    q.push({adjlist[cur_node][i],cur_depth+1});
+                    len[adjlist[cur_node][i]]=cur_depth+1;
+                }
+        }
+        cur_depth++;
+        sz=q.size();
+    }
+    return len; //cur_node is the furthest node from src with depth (cur_depth-1)
+}
+
+3- Single source to single destination:
+vector<int> bfs(int src,int dst,vector<vector<int>>& adjlist)
+{
+    vector<int> len(adjlist.size(),INT_MAX),par(adjlist.size(),-1);
+    queue<int> q;
+    q.push(src);
+    len[src]=0;
+    int cur_node,cur_depth=0,sz=1;
+    bool ok=true;
+    while(ok&&!q.empty())
+    {
+        while(ok&&sz--)
+        {
+            cur_node=q.front();
+            q.pop();
+            if(cur_node==dst)
+            {
+                ok=false;
+                break;
+            }
+            for(int i=0;i<adjlist[cur_node].size();i++)
+                if(len[adjlist[cur_node][i]]==INT_MAX)
+                {
+                    q.push({adjlist[cur_node][i],cur_depth+1});
+                    len[adjlist[cur_node][i]]=cur_depth+1;
+                    par[adjlist[cur_node][i]]=cur_node;
+                }
+        }
+        cur_depth++;
+        sz=q.size();
+    }
+    vector<int> path;
+    while(dst!=-1)
+    {
+        path.push_back(dst);
+        dst=par[dst];
+    }
+    reverse(path.begin(),path.end());
+    return path;
+}
+
+
+Notes:
+- All is done by 1 BFS
+- 1-1, 1-m
+- m-1 -> Reverse it, start with target and go to sources. Ex: given set of nodes and you want to find which one of them is the closest to another node. Use for loop
+from each node in the set and apply 1-1 BFS.
+- m-m -> Set all start nodes in Q, and find targets(len array will contain the best answer).
+- We can check bipartiteness using BFS or DFS
