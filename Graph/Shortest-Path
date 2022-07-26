@@ -74,7 +74,7 @@ int dijkstra2(vector<vector<pair<int,int>>> adjList,int src,int dest=-1) //o(E*l
     }
     return -1;
 }
-
+-Note: we can push negative weights so there won't be any need for greater<>.
 --Functor:
 struct comp{
     bool operator()(pair<int,int>& l,pair<int,int>& r)
