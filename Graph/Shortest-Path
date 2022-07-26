@@ -48,16 +48,17 @@ int dijkstra1(vector<vector<int>> adjMat,int src,int dest=-1) //o(n^2)
 }
 -This o(n^2) implementation works with adjecancy matrix representation.
 
+--Without functor
 int dijkstra2(vector<vector<pair<int,int>>> adjList,int src,int dest=-1) //o(E*logV)
 {
     int n=adjList.size();
     vector<int> dist(n,INT_MAX),prev(n,-1);
-    priority_queue<pair<int,int>>q;
+    priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>q;
     dist[src]=0;
-    q.push({src,0});
+    q.push({0,src});
     while(!q.empty())
     {
-        int cur_node=q.top().first,cur_weight=q.top().second;
+        int cur_node=q.top().second,cur_weight=q.top().first;
         q.pop();
         if(cur_weight>dist[cur_node])//instead of using visited array as this means we visit this node before and with less cost.
             continue;
@@ -68,14 +69,26 @@ int dijkstra2(vector<vector<pair<int,int>>> adjList,int src,int dest=-1) //o(E*l
             {
                 dist[adjList[cur_node][i].first]=dist[cur_node]+adjList[cur_node][i].second;
                 prev[adjList[cur_node][i].first]=cur_node;
-                q.push({adjList[cur_node][i].first,adjList[cur_node][i].second});
+                q.push({dist[adjList[cur_node][i].first],adjList[cur_node][i].first});
             }
     }
     return -1;
 }
+
+--Functor:
+struct comp{
+    bool operator()(pair<int,int>& l,pair<int,int>& r)
+    {
+        return r.second>l.second;
+    }
+};
+priority_queue<pair<int,int>,vector<pair<int,int>>,comp>p;
+
 -This o(E*logV) implementation works with adjecancy list representation.
 -We can genaralized dijkstra to many sources by iterating on each node and call dijkstra and make distance matrix as a 2d array.
 -For dynamic graphs(dense graphs with a ton of nodes we don't store it in memory(MLE)) we just put the starting node in the piriority queue and inside dijkstre we
 generate parts of the adjacency list.
+-Important Note:
+Priority queue if you give it pair of values, it always compares based on the first so you should make it the distance or write your own functor.
 
 
