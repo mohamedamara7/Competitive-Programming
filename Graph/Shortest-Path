@@ -75,3 +75,7 @@ int dijkstra2(vector<vector<pair<int,int>>> adjList,int src,int dest=-1) //o(E*l
 }
 -This o(E*logV) implementation works with adjecancy list representation.
 -We can genaralized dijkstra to many sources by iterating on each node and call dijkstra and make distance matrix as a 2d array.
+-For dynamic graphs(dense graphs with a ton of nodes we don't store it in memory(MLE)) we just put the starting node in the piriority queue and inside dijkstre we
+generate parts of the adjacency list.
+
+
