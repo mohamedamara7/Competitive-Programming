@@ -1,0 +1,77 @@
+SSSP(single source shortest path):
+1-Dijkstr Algorithm:
+-Single-source shortest-paths problem: From one source s, find SP to all other nodes.
+-Dijkstra works if the graph doesn't have negative cycles. For negative edges without negative cycles it will give the correct answer if we are trying to find the answer
+between the source and all the other nodes but if we are trying to find it between the sourcce and a destination it may gives us a wrong answer so the best solution is
+to sovle it as it's a source to many and at the end take the result of the destination.
+Exampl:
+a graph: (A,C,5), (A,B,7), (B,C,-4) if the source is A, the destination is C and we end the algorithm once we reach C this will give us a wrong answer.
+a graph: (A,C,-4), (A,B,7), (B,C,5) if the source is A, the destination is C and we end the algorithm once we reach C this will give us a right answer.
+-To solve single-destination shortest-paths problem: Reverse edges direction = single-source problem.
+-A shortest path between two vertices contains other shortest paths within it.
+		E.g. SP(2, 7) = 2-4-3-8-7	-> SP(4, 8) = 4-3-8
+-For a given source s, the set of shortest paths from s to other n-1 nodes, construct a tree, called SP tree
+-In a graph of N nodes, longest path will have N-1 edges. If not it will have cycle, then not SP!
+-If there is a -ve cycle C, and s reaches C, and C reaches d -> The SP(s, d) = -OO
+-Some algorithms could handle -ve cycles (e.g. Floyd, Bellman), Others Can't (e.g. Dijkstra)
+-Relaxation is good! Say so far we go from (2, 7) = 20. We know too that (2, 3) = 5 and (3, 7) = 12
+		Then we could RELAX path to take other way, then (2, 7) = min( (2, 7), (2, 3) + (3, 7) ) = 17
+    
+-Dijkstra Algorithm:
+As long as remain nodes
+1- Pick non visited node with minimum cost
+2- Relax Graph using this node (as if node is removed and its info is distrusted to graph
+
+int dijkstra1(vector<vector<int>> adjMat,int src,int dest=-1) //o(n^2)
+{
+    int n=adjMat.size();
+    vector<int> dist(n,INT_MAX),prev(n,-1);
+    vector<bool>vis(n,0)l
+    dist[src]=0;
+    while(true)
+    {
+        int idx=-1,val=INT_MAX;
+        for(int i=0;i<n;i++)
+            if(!vis[i]&&val>dist[i])
+            {
+                idx=i;
+                val=dist[i];
+            }
+        if(idx==-1||idx==dest)// to get a correct result for negative edges we should remove idx==dest condition.
+            return break;
+        vis[idx]=1;
+        for(int i=0;i<n;i++)
+            if(dist[i]>val+adjMat[idx][i])
+                dist[i]=val+adjMat[idx][i],prev[i]=idx; //relax
+    }
+    return dest==-1?-1:dist[dest];
+}
+-This o(n^2) implementation works with adjecancy matrix representation.
+
+int dijkstra2(vector<vector<pair<int,int>>> adjList,int src,int dest=-1) //o(E*logV)
+{
+    int n=adjList.size();
+    vector<int> dist(n,INT_MAX),prev(n,-1);
+    priority_queue<pair<int,int>>q;
+    dist[src]=0;
+    q.push({src,0});
+    while(!q.empty())
+    {
+        int cur_node=q.top().first,cur_weight=q.top().second;
+        q.pop();
+        if(cur_weight>dist[cur_node])//instead of using visited array as this means we visit this node before and with less cost.
+            continue;
+        if(cur_node==dest)
+            return dist[dest]; //as we said we should not write this for -ve weights
+        for(int i=0;i<adjList[cur_node].size();i++)
+            if(dist[adjList[cur_node][i].first]>dist[cur_node]+adjList[cur_node][i].second)
+            {
+                dist[adjList[cur_node][i].first]=dist[cur_node]+adjList[cur_node][i].second;
+                prev[adjList[cur_node][i].first]=cur_node;
+                q.push({adjList[cur_node][i].first,adjList[cur_node][i].second});
+            }
+    }
+    return -1;
+}
+-This o(E*logV) implementation works with adjecancy list representation.
+-We can genaralized dijkstra to many sources by iterating on each node and call dijkstra and make distance matrix as a 2d array.
