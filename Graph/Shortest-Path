@@ -79,7 +79,7 @@ int dijkstra2(vector<vector<pair<int,int>>> adjList,int src,int dest=-1) //o(E*l
 struct comp{
     bool operator()(pair<int,int>& l,pair<int,int>& r)
     {
-        return r.second>l.second;
+        return l.second>r.second;
     }
 };
 priority_queue<pair<int,int>,vector<pair<int,int>>,comp>p;
