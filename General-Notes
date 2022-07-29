@@ -1,0 +1,2 @@
+-An array or string can be sorted in o(n*logn) or in o(n) using frequency matrix.
+-The number of subsequences is 2^N and the number of subarrays is N*(N+1)/2.
