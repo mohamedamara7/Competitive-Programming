@@ -1,3 +1,10 @@
+--Note we can solve longest path problems by shortest path algorithms after negating all weights. In general:
+Graph negative:
+ * 	Shortest <-> Longest
+ * 	Postive Cycle <-> Negative Cycle
+ * 	Minimax <-> Maximin
+
+
 SSSP(single source shortest path):
 1-Dijkstr Algorithm:
 -Single-source shortest-paths problem: From one source s, find SP to all other nodes.
@@ -91,4 +98,200 @@ generate parts of the adjacency list.
 -Important Note:
 Priority queue if you give it pair of values, it always compares based on the first so you should make it the distance or write your own functor.
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+APSP(All pairs shortest path):
+We can use any SSSP and loop on every node in the graph and calculte the shortest path between it and the other nodes but this will take O(n * complexity SSSP algo)
+which will be O(n^2 * logn) or O(n^3). Instead we can use FW algo with complexity O(V^3).
+- Floyd-Warshall:
+https://www.youtube.com/watch?v=oNI0rf2P9gE&ab_channel=AbdulBari
+Best way to represent the graph for FW is the adjacency matrix.
+
+int shortest_path(int i,int j)
+{
+    int mn=adj_mat[i][j]; //direct path from i to j
+    for(int k=0;k<n;k++)
+        if(k!=i&&k!=j)
+            mn=min(mn,shortest_path(i,k)+shortest_path(k,j)); //path as the node k is intermediate between i,j
+    return mn;
+}
+The previous recurrence is cyclic so the dp will give us incorrect answers. We can redefine the recurrence and add a new parameter(k) identify number of nodes that had
+been taken as intermediate nodes and we choose the min between taking a path based on the k-1 nodes as intermediate(the path won't pass through the k'th node) or 
+adding a new node to them and calculate the new path as it's an intermdiate.
+int floyd(int i, int j, int k)
+{
+    if(k==0) //no intermediate nodes
+        return adj_mat[i][j];
+    return min(floyd(i,j,k-1),floyd(i,k,k-1)+floyd(k,j,k-1));
+}
+Usually, we use FW in the table style.
+
+void floyd1()
+{
+    int adj_mat[n][n],dp[n+1][n][n];
+    //Making level 0 as the real distances in the graph
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            dp[0][i][j]=adj_mat[i][j];
+    for(int k=0;k<n;k++)
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                if(dp[k][i][k]<OO && dp[k][k][j]<OO)
+                    dp[k+1][i][j]=min(dp[k][i][j],dp[k][i][k]+dp[k][k][j]);
+		else
+                    dp[k+1][i][j]=dp[k][i][j];
+}
+
+-Instead of 3-d dp array we can use only 2-d as we need only to store the previous level to calculate the new level.
+
+void floyd2()
+{
+	// 0 - Infinity MUST be larger than any path. Say we have n = 1000, and cost of edge max 5000, then min OO to = (1000-1) * 5000 + 1
+	// 1- Set whole array to infinity:
+	// 2- read input edges
+	// 3- set diagonal to zeros: sometimes, if negative input you would like to leave them: e.g. adj[3][3] = -7 -> a self cycle
+
+	// k: Incrementally add new node and update matrix
+    int adj_mat[n][n];
+    for(int k=0;k<n;k++)
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                if(adj_mat[i][k]<OO && adj_mat[k][j]<OO)// you could remove this line IFF 2*OO fit in the data type.
+                    adj_mat[i][j]=min(adj_mat[i][j],adj_mat[i][k]+adj_mat[k][j]);
+}
+Note: We should always loop on K before i,j.
+--If we want to build the path, we will intialize a 2d array to -1 means no intermediate nodes between i,j. If path (i, j) has intermediate node k, then path[i][j] = k;
+means path from i to j pass with k.
+
+void build_path(int src, int dest)
+{
+	if(path[src][dest]==-1)
+	{
+		cout<<src<<" "<<dest<<endl;
+		return;
+	}
+	build_path(src,path[src][dest]);
+	build_path(path[src][dest],dest);
+}	
+
+-Applications using FW:
+
+-Transitive Closure: detecting if there's a path between 2 nodes or no which means we don't care about the shortest path. We will represent the adj_mat as 0s,1s means
+there's a path between node i,j or no.
+
+void transitive_closure()
+{
+    for(int k=0;k<n;k++)
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                adj[i][j]|=(adj[i][k]&adj[k][j]);
+}
+
+-Minimax: if we have many paths between nodes i,j we want to find the minimum maximum value between these paths. Example we have 3 paths between i,j we the following
+weights:
+1-5-6-7-2 max:7
+2-3-3-4   max:4
+6-3-2-1   max:6
+the minimum of maximums is 4.
+
+void minimax()
+{
+    for(int k=0;k<n;k++)
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                adj[i][j]=min(adj[i][j],max(adj[i][k],adj[k][j]));
+}
+
+-Maximin:
+
+void maximin()
+{
+    for(int k=0;k<n;k++)
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                adj[i][j]=max(adj[i][j],min(adj[i][k],adj[k][j]));
+}
+
+-Longest path in DAG(Maximax):
+
+void longest_path_DAG()
+{
+    for(int k=0;k<n;k++)
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                adj[i][j]=max(adj[i][j],max(adj[i][k],adj[k][j]));
+}
+
+-Coutn paths: counting the number of paths between i,j. We will represent the adj_mat as 0s,1s means there's a path between node i,j or no.
+
+void count_paths()
+{
+    for(int k=0;k<n;k++)
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                adj[i][j]+=adj[i][k]*adj[k][j]; //number of paths between i,j is the same plus (number of paths between i,k * number of paths between k,j)
+}
+
+Detecting the negative cycle: if you had a cycle in a graph, the longest path wouldn't be well defined, because you could keep going round and round the cycle making 
+the path longer. We can detect it by applying FW and looping on the path between the node and itself and if it negative this means there's a negative cycle.
+
+bool is_negative_cycle()
+{
+    floyd2();
+    for(int i=0;i<n;i++)
+        if(adj_mat[i][i]<0)
+            return true; // then node i got to i with overall cost < 0.
+    return false;
+}
+
+-Detecting effective cylce between two nodes: detecting if nodes i,j pass on a cycle. We loop on the node and itself and if there's a negative cycle and the src goes
+to the destination through this node.
+
+bool any_effective_cycle(int src, int dest)
+{
+    floyd2();
+    for(int i=0;i<n;i++)
+        if(adj_mat[i][i]<0&&adj_mat[src][i]<OO&&adj_mat[i][dest]<OO)
+            return true;
+    return false;
+}
+
+-Graph diameter: longest path among all shortest ones.
+
+int graph_diameter()
+{
+    floyd2();
+    int mx=0;
+    for(int i=0,i<n;i++)
+        for(int j=0;j<n;j++)
+            if(adj_mat[i][j] < OO)
+                mx=max(mx,adj_mat[i][j]);
+    return mx;
+}
+
+-Strongly Connected Components(SCC): a cycle represent a SCC and if there's an individual node without any cycle it represent a SCC. We can use FW to represent SCC
+and the relation between them. Apply FW and then take each node if you didn'y visit it before and from it try to reach the other nodes of there's a path between i,j
+and j,i then they are related to the same component.
+
+vecttor<vector<int>> SCC()
+{
+    vector<int> comp(n,-1); //-1 means the node isn't related to any component yet
+    int cnt=0;
+    for(int i=0;i<n;i++)
+        if(comp[i]==-1)
+        {
+            comp[i]=cnt++;
+            for(int i=0;i<n;i++)
+                if(adj[i][j]<OO&&adj[j][i]<OO)
+                    comp[j]=comp[i];
+        }
+    // at the end cnt will contain the number of connected components 
+    vector<vector<int>> compGraph(cnt,vector<int>(cnt,0));
+    //loop on each pair of nodes if there's an edge between them and they are of different components make a new edge between their componens.
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            if(adj[i][j]<OO&&comp[i]!=comp[j])
+                compGraph[comp[i]][comp[j]]=1;
+    return compGraph;
+}
+We build SCC in o(n^3) we can build it in o(V+E).
