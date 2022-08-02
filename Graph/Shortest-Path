@@ -295,3 +295,5 @@ vecttor<vector<int>> SCC()
     return compGraph;
 }
 We build SCC in o(n^3) we can build it in o(V+E).
+Note: If we need only to check if node i,j are in the same SCC we can make an bool adjcency matrix where 1 means there's a path between i,j and surely we will make 
+adj[i][i]=1 means node i,i are connected and then run transtive closure on the adj_mat and the new result of adj[i][j] means i,j are in the same SCC or no.
