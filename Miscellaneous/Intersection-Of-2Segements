@@ -1,0 +1,45 @@
+We will use orientation to detect if there's an intersection between 2 segments(not lines). Orientation means if we have a point and a line is the point position is
+counter clock wise or clock wise with respect to an end of the line or it's colliner(on the line). To calculate the orientation assume we have a segment AB and a
+point c, if the cross product of CB and CA is +ve so it's CW, if -ve it's CCW, if 0 it's collinear. Cross product of (x1,y1) and (x2,y2) is x1y2-x2y1
+
+How is Orientation useful here? 
+Two segments (p1,q1) and (p2,q2) intersect if and only if one of the following two conditions is verified
+1. General Case: 
+– (p1, q1, p2) and (p1, q1, q2) have different orientations and 
+– (p2, q2, p1) and (p2, q2, q1) have different orientations.
+Different orientation (CW,CCW),(CCW,CW),(CW,COLLINEAR),(CCW,COLLINEAR).....
+2. Special Case 
+– (p1, q1, p2), (p1, q1, q2), (p2, q2, p1), and (p2, q2, q1) are all collinear. There may be intersection or no.
+Examples on intersections:  p1        p2       q1       q2  or   p1      p2   q2      q1 and so on...
+Examples on non intersection:  p1            q1    p2           q2
+To detect intersection in this case we should check ((p2.x>=min(p1.x,q1.x)&&p2.x<=max(p1.x,q1.x))||(q2.x>=min(p1.x,q1.x)&&q2.x<=max(p1.x,q1.x)))
+
+Code:
+
+struct segment{
+    int x1,x2,y1,y2;
+};
+
+int orientation(int x1,int y1,int x2,int y2,int x3,int y3)
+{
+    //cross product between p3p1,p3p2
+    int val= (x3-x1)*(y2-y3)-(x2-x3)*(y3-y1);
+    if(val>0)
+        return 1;
+    if(val<0)
+        return -1;
+    return 0;
+}
+bool isIntersection(segment seg1,segment seg2)
+{
+    int o1=orientation(seg1.x1,seg1.y1,seg1.x2,seg1.y2,seg2.x1,seg2.y1),
+        o2=orientation(seg1.x1,seg1.y1,seg1.x2,seg1.y2,seg2.x2,seg2.y2),
+        o3=orientation(seg2.x1,seg2.y1,seg2.x2,seg2.y2,seg1.x1,seg1.y1),
+        o4=orientation(seg2.x1,seg2.y1,seg2.x2,seg2.y2,seg1.x2,seg1.y2);
+    if(o1!=o2&&o3!=o4)
+        return true;
+    if(!o1&&!o2&&!o3&&!o4&&((min(seg1.x1,seg1.x2)>=min(seg2.x1,seg2.x2)&&min(seg1.x1,seg1.x2)<=max(seg2.x1,seg2.x2))||
+                            (max(seg1.x1,seg1.x2)>=min(seg2.x1,seg2.x2)&&max(seg1.x1,seg1.x2)<=max(seg2.x1,seg2.x2))))
+        return true;
+    return false;
+}
