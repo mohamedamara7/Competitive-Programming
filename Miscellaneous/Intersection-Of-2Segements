@@ -12,7 +12,8 @@ Different orientation (CW,CCW),(CCW,CW),(CW,COLLINEAR),(CCW,COLLINEAR).....
 – (p1, q1, p2), (p1, q1, q2), (p2, q2, p1), and (p2, q2, q1) are all collinear. There may be intersection or no.
 Examples on intersections:  p1        p2       q1       q2  or   p1      p2   q2      q1 and so on...
 Examples on non intersection:  p1            q1    p2           q2
-To detect intersection in this case we should check ((p2.x>=min(p1.x,q1.x)&&p2.x<=max(p1.x,q1.x))||(q2.x>=min(p1.x,q1.x)&&q2.x<=max(p1.x,q1.x)))
+To detect intersection in this case we will check each oriantion if it's 0 then we will check if the point is on the segment or no by checking its x position and y 
+position with repsect to the segment.
 
 Code:
 
@@ -20,6 +21,12 @@ struct segment{
     int x1,x2,y1,y2;
 };
 
+bool onSegment(segment seg, int x, int y)
+{
+    if((x>=min(seg.x1,seg.x2)&&x<=max(seg.x1,seg.x2))&&(y>=min(seg.y1,seg.y2)&&y<=max(seg.y1,seg.y2)))
+        return true;
+    return false;
+}
 int orientation(int x1,int y1,int x2,int y2,int x3,int y3)
 {
     //cross product between p3p1,p3p2
@@ -38,8 +45,8 @@ bool isIntersection(segment seg1,segment seg2)
         o4=orientation(seg2.x1,seg2.y1,seg2.x2,seg2.y2,seg1.x2,seg1.y2);
     if(o1!=o2&&o3!=o4)
         return true;
-    if(!o1&&!o2&&!o3&&!o4&&((min(seg1.x1,seg1.x2)>=min(seg2.x1,seg2.x2)&&min(seg1.x1,seg1.x2)<=max(seg2.x1,seg2.x2))||
-                            (max(seg1.x1,seg1.x2)>=min(seg2.x1,seg2.x2)&&max(seg1.x1,seg1.x2)<=max(seg2.x1,seg2.x2))))
+    if((!o1&&onSegment(seg1,seg2.x1,seg2.y1))||(!o2&&onSegment(seg1,seg2.x2,seg2.y2))||
+        (!o3&&onSegment(seg2,seg1.x1,seg1.y1))||(!o4&&onSegment(seg2,seg1.x2,seg1.y2)))
         return true;
     return false;
 }
