@@ -1,0 +1,54 @@
+https://www.mathblog.dk/disjoint-set-data-structure/
+
+Union-Find(Disjoint Set):
+Used to check if two nodes share the same root or no. We can visualize it as a set of trees and we want to check if 2 vertex have the same root node or no. We will
+use an array -called parent- to represent these trees where the index represents the vertex and the value represent the parent of this vertex, if the vertex is the root we will put its 
+index instead.
+There'are two main methods in Disjiont set which are find and union.
+Find: takes a vertex and return the parent of this vertex can be implemented iteratively or recursively.
+Union: takes 2 vertces and makes a root of an index parent to the root of the other vertex.
+union(x,y):
+  root_x=find(x),root_y=find(y);
+  parent[root_x]=root_y or parent[root_y]=root_x
+  
+
+There's 2 optimization:
+1-Path compression: as we only need to know the root of an index not the path to the root -the connectivity- so we will store the root of it not its parent so we can find
+in o(1). We will do it while we do find operation.
+2-Union by rank: imagine a scenarion where we union 2 trees one is very tall and the other is very short if we make the short parent to the tall we will have a hight
+bigger than the hight we will have if we make the long parent to the short and we always want to minimize the height to minimize number of operation. Thus, we have to 
+know the length of each set and union based on the length by making the tall tree parent to the short(by the way the new length will be the length of the tall tree).
+Note path compression can make the rank of tree of length 4 ->> 1 but we mentain the rank as an estimated length.
+
+class DisjointSet{
+public:
+    vector<int> par,rank;
+    int nSets;
+    DisjointSet(int n)
+    {
+        par=vector<int>(n);
+        rank=vector<int>(n,1);
+        nSets=n;
+        for(int i=0;i<n;i++)
+            par[i]=i;
+    }
+    int findSet(int x)
+    {
+        if(par[x]==x)
+            return x;
+        return par[x]=findSet(par[x]); // We return par[x]=findSet(par[x]) instead of findSet(par[x]) to make path compression
+    }
+    bool unionSets(int x,int y)  //returns 0 if x,y are from the same set so they are already union
+    {
+        int setX=findSet(x),setY=findSet(y);
+        if(setX==setY)
+            return 0;
+        if(rank[setX]>rank[setY])
+            swap(setX,setY);
+        par[setX]=setY;
+        if(rank[setX]==rank[setY])
+            rank[setY]+=1;
+        nSets--;
+        return 1;
+    }
+};
