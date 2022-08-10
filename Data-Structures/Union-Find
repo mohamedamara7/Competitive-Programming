@@ -51,4 +51,11 @@ public:
         nSets--;
         return 1;
     }
+    vector<vector<int>> connectedComponents()
+    {
+        vector<vector<int>>CC(par.size());
+        for(int i=0;i<par.size();i++)
+            v[findSet(i)].push_back(i);
+        return CC;
+    }
 };
