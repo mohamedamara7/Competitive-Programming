@@ -51,6 +51,10 @@ public:
         nSets--;
         return 1;
     }
+    bool sameSet(int x,int y)
+    {
+        return findSet(x)==findSet(y);
+    }
     vector<vector<int>> connectedComponents()
     {
         vector<vector<int>>CC(par.size());
