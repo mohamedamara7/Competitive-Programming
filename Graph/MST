@@ -1,0 +1,225 @@
+Spaning tree:
+spans over all vertices of a given graph with no cycles.
+Minimum Spanning Tee(MST):
+is a subset of the edges of a connected, edge-weighted undirected graph that connects all the vertices together, without any cycles and with the minimum possible total 
+edge weight.
+-Number of edges in the tree is number of vertex-1.
+-If the graph isn't connected so there won't be any MST.
+
+1-Prim's algorithm:
+-create e tree containing any single vertex from graph.
+-Loop N-1(to take the remaining nodes):
+--Find all edges that connect any node inside current tree to a node outside the tree then pick the edge with the minimum cost and connect it.
+
+--djacency matrix implementation O(n^2):
+It's like dijkstra we will have distance and visisted array but dis[i] here is the minimum distance between node i and currently exists node in the MST.
+
+struct edge {
+	int from, to, w;
+
+	edge(int from, int to, int w): from(from), to(to), w(w) {}
+};
+
+//ajdMat is initialized by OO
+pair<int,vector<edge>> Prim1(vector<vector<int>> adjMat) //O(n^2)
+{
+    int n=adjMat.size();
+    vector<int>dist(n,OO),prev(n,-1);
+    vector<bool>vis(n,0);
+    vector<edge>edges; //MST edges
+    int cur_node=0,mn_dis,mn_idx,mst_cost=0;
+    for(int i=0;i<n-1;i++)
+    {
+        vis[cur_node]=1,mn_dis=INT_MAX,mn_idx=-1;
+        for(int i=0;i<n;i++)
+            if(!vis[i])
+            {
+                if(dist[i]>adjMat[cur_node][i])
+                    dist[i]=adjMat[cur_node][i],prev[i]=cur_node;
+                if(dist[i]<mn_dis)
+                    mn_dis=dist[i],mn_idx=i;
+            }
+        if(mn_idx==-1)
+            break; //the graph is disconnected.
+        edges.push_back(edge(prev[mn_idx],mn_idx,adjMat[prev[mn_idx]][mn_idx]));
+        cur_node=mn_idx,mst_cost+=dist[cur_node];
+    }
+    if(edges.size()!=n-1)
+        return {INT_MAX,vector<edge>()};
+    return {mst_cost,edges};
+}
+
+
+--Adjacency list O((E+V)*logV):
+struct comp{
+    bool operator() (edge &l,edge &r)
+    {
+        return l.w>r.w;
+    }
+};
+pair<int,vector<edge>> Prim2(vector<vector<pair<int,int>>> adjList) //O(n^2)
+{
+    int n=adjList.size();
+    vector<int>dist(n,OO);
+    vector<bool>vis(n,0);
+    vector<edge> edges; //MST edges
+    priority_queue<edge,vector<edge>,comp>q;
+    q.push(edge(-1,0,0));
+    int mst_cost=0;
+    while(!q.empty())
+    {
+        edge cur_edge=q.top();
+        q.pop();
+        if(vis[cur_edge.to])
+            continue;
+        vis[cur_edge.to]=1;
+        mst_cost+=cur_edge.w;
+        if(cur_edge.to) //cur_edge.to!=0 to avoid cycle
+            edges.push_back(cur_edge);
+        for(int i=0;i<adjList[cur_edge.to].size();i++)
+            if(!vis[adjList[cur_edge.to][i].first])
+                q.push(edge(cur_edge.to,adjList[cur_edge.to][i].first,adjList[cur_edge.to][i].second));
+    }
+    if(edges.size()!=n-1)
+        return {INT_MAX,vector<edge>()};
+    return {mst_cost,edges};
+}
+
+2-Kruskal's Algorithm:
+-We are sorting edges and takes the edges that won't make a cycle.
+If we trace it, we will see that Kruskal builds seperated sets and join it together at the end in one set. When we try to take an edge that will make a cycle we will
+find that it's vertces are from the same set so that's the reason of using DisjointSet. it's simpler and preferly to use edgeList representation with Kruskal's.
+
+class DisjointSet{
+public:
+    vector<int> par,rank;
+    int nSets;
+    DisjointSet(int n)
+    {
+        par=vector<int>(n);
+        rank=vector<int>(n,1);
+        nSets=n;
+        for(int i=0;i<n;i++)
+            par[i]=i;
+    }
+    int findSet(int x)
+    {
+        if(par[x]==x)
+            return x;
+        return par[x]=findSet(par[x]); // We return par[x]=findSet(par[x]) instead of findSet(par[x]) to make path compression
+    }
+    bool unionSets(int x,int y)  //returns 0 if x,y are from the same set so they are already union
+    {
+        int setX=findSet(x),setY=findSet(y);
+        if(setX==setY)
+            return 0;
+        if(rank[setX]>rank[setY])
+            swap(setX,setY);
+        par[setX]=setY;
+        if(rank[setX]==rank[setY])
+            rank[setY]+=1;
+        nSets--;
+        return 1;
+    }
+};
+
+struct edge{
+    int from,to,w;
+    edge(int from, int to, int w): from(from),to(to),w(w) {}
+    bool operator < (const edge &e) const{
+        return w>e.w;
+    }
+};
+
+pair<int,vector<edge>> MST_kruskal(vector<edge> edgeList,int n)
+{
+    DisjointSet DS(n);
+    int MST_cost=0;
+    vector<edge>MST;
+    priority_queue<edge> q;
+    for(int i=0;i<edgeList.size();i++)
+            q.push(edgeList[i]);
+    while(!q.empty())
+    {
+        edge cur_edge=q.top();
+        q.pop();
+        if(DS.unionSets(cur_edge.from,cur_edge.to))
+        {
+            MST_cost+=cur_edge.w;
+            MST.push_back(cur_edge);
+        }
+    }
+    if(MST.size()!=n-1)
+        return {INT_MAX,vector<edge>()};
+    return {MST_cost,MST};
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+General Notes:
+--If we are using kruskal it's preferly to use edgeList representation.
+
+For more illustration on the following application check CP3.
+--to find second best MST(is a spanning tree with the second minimum weight sum of all edges) using Prim or Kruskal(easier): you will need to handle carefully repeated 
+edges:
+1-Find MST
+2-For each edge in MST
+  3-Remove that edge from the graph
+  4-Run MST and compare the new MST_cost with a minimum value
+  5-Back that edge for the graph
+6-Display the minimum cost
+We can modify the previous algorithm to reduce the complexity:
+1-We will calc the mst more than once so at each time the prioriy queue will be empty and we will push edges on it and the priority queue will sort it again!!! so 
+instead we can use an array and sort it and loop on it like we are using priority queue but we will push elements to it and sort it only once.
+2-Rather than remove an edge and then back it we can modify the loop of kruskal to check that if the current edge is the same as the edge we want to delete so we will
+ignore it.
+
+--‘Minimum’ Spanning Subgraph
+In this variant, we do not start with a clean slate. Some edges in the given graph have already been fixed and must be taken as part of the solution, for example: 
+UVa 10147 - Highways. These default edges may form a non-tree in the first place. Our task is to continue selecting the remaining edges (if necessary) to make the 
+graph connected in the least cost way. The resulting Spanning Subgraph may not be a tree and even if it is a tree, it may not be the MST. That’s why we put the term 
+‘Minimum’ in quotes and use the term ‘subgraph’ rather than ‘tree’.
+The solution for this variant is simple. After taking into account all the fixed edges and their costs, we continue running Kruskal’s algorithm on the remaining free 
+edges until we have a spanning subgraph (or spanning tree).
+1-Union the fixed edges.
+2-Run Kruskal on the remaining edges.
+
+--Minimum ‘Spanning Forest’
+In this variant, we want to form a forest of K connected components (K subtrees) in the least cost way where K is given beforehand in the problem description, for 
+example: UVa 10369 - Arctic Networks. To get the minimum spanning forest is simple. Run Kruskal’s algorithm as per normal, but as soon as the number of connected 
+components equals to the desired pre-determined number K, we can terminate the algorithm.
+
+--Minimax (and Maximin) also solvable by FW
+The minimax path problem between vertex i and j can be solved by modeling it as an MST problem. With a rationale that the problem prefers a path with low individual 
+edge weights even if the path is longer in terms of number of vertices/edges involved, then having the MST (using Kruskal’s or Prim’s) of the given weighted graph is 
+a correct step. The MST is connected thus ensuring a path between any pair of vertices. The minimax path solution is thus the max edge weight along the unique path 
+between vertex i and j in this MST. The overall time complexity is O(build MST + one traversal on the resulting tree). As E = V −1 in a tree, any traversal on tree is 
+just O(V ). Thus the complexity of this approach is O(E log V + V ) = O(E log V ).
+Another solution with out building the mst is:
+for(i=0;!sameSet(src,dest);t++)
+    unionSets(e[i].from,e[i].to);
+the edge that breaks the loop is the minimax edge(because we sort edges so the last one is the max one).
+
+--
+Total number of spanning trees in a "complete" grapg is V^(V-2) if the graph is incomplete we can use kirchoff's theorem:
+let's say n is the number of nodes, arr is a binary adjacency matrix, deg is the degree of each node. We should drop one row and one colum from the adjacency matrix
+so we will drop the last row and the last colum and the construct the laplace matrix (degree matrix - adjacency matrix) and the answer is the determinant of this 
+matrix.
+vector<vector<long double>> mat(n-1,vector<long double>(n-1))
+for(int i=0;i<n-1;i++)
+    for(int j=0;j<n-1;j++)
+        mat[i][j]=-adj[i][j];
+        if(i==j) //if it's an element on the diagonal.
+            mat[i][j]+=adj[i][j];
+answer is the determinant of mat.
+
+--Critical and Pseudo-Critical Edges in Minimum Spanning Tree:
+https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/
+First approach O(E^2):
+     An MST edge whose deletion from the graph would cause the MST weight to increase is called a critical edge. On the other hand, a pseudo-critical edge is that 
+     which can appear in some MSTs but not all. So run Kruskal with and without each edge and if returning cost without that edge>MST_cost then this's a critical edge
+     a corner case is we can't create and MST with N-1 edges without that edge so this edge is surely a critical edge. if returning cost with that edge=MST_cost 
+     then this's a pseudo-critical edge
+Second approach O(ElogE):
+    Depends on SCC using trajan's o(E+V) rather than O(E^3) using FW algo so insha'Allah I will return to it after studying SCC.
+    https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/discuss/698311/Python-UnionFind-%2B-Kruskal-solution-with-detail-explanation-from-O(E2)-to-O(ElogE)
