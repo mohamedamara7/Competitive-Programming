@@ -269,8 +269,8 @@ int graph_diameter()
     return mx;
 }
 
--Strongly Connected Components(SCC): a cycle represent a SCC and if there's an individual node without any cycle it represent a SCC. We can use FW to represent SCC
-and the relation between them. Apply FW and then take each node if you didn'y visit it before and from it try to reach the other nodes of there's a path between i,j
+-Strongly Connected Components(SCC): a cycle represents a SCC and if there's an individual node without any cycle it represent a SCC. We can use FW to represent SCC
+and the relation between them. Apply FW and then take each node if you didn't visit it before and from it try to reach the other nodes. If there's a path between i,j
 and j,i then they are related to the same component.
 
 vecttor<vector<int>> SCC()
@@ -295,5 +295,9 @@ vecttor<vector<int>> SCC()
     return compGraph;
 }
 We build SCC in o(n^3) we can build it in o(V+E).
-Note: If we need only to check if node i,j are in the same SCC we can make an bool adjcency matrix where 1 means there's a path between i,j and surely we will make 
-adj[i][i]=1 means node i,i are connected and then run transtive closure on the adj_mat and the new result of adj[i][j] means i,j are in the same SCC or no.
+Note: 
+In an undirected graph SCC is only to check connected components. so if we need only to check if node i,j are in the same SCC for an undirected graph we can make an 
+bool adjcency matrix where 1 means there's a path between i,j and surely we will make  adj[i][i]=1 means node i,i are connected and then run transtive closure on the 
+adj_mat and the new result of adj[i][j] means i,j are in the same SCC or no. If directed arr[i][j]=1 and arr[j][i]=1 so they are in the same component.
+Example: UVA 273
+If directed graph we should use the previous method or tarjan's algo.
