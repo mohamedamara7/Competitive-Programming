@@ -210,7 +210,7 @@ for(int i=0;i<n-1;i++)
     for(int j=0;j<n-1;j++)
         mat[i][j]=-adj[i][j];
         if(i==j) //if it's an element on the diagonal.
-            mat[i][j]+=adj[i][j];
+            mat[i][j]+=deg[i][j];
 answer is the determinant of mat.
 
 --Critical and Pseudo-Critical Edges in Minimum Spanning Tree:
