@@ -223,3 +223,8 @@ First approach O(E^2):
 Second approach O(ElogE):
     Depends on SCC using trajan's o(E+V) rather than O(E^3) using FW algo so insha'Allah I will return to it after studying SCC.
     https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/discuss/698311/Python-UnionFind-%2B-Kruskal-solution-with-detail-explanation-from-O(E2)-to-O(ElogE)
+
+-Finding all MSTsL
+    Assume after we build MST the weights of it was 1 3 5 6 9 and the remaining edges was 3 4 6. If we want to replace any edge in the mst and have the same minimum
+    cost then we should replace it with an edge that has the same weight so we can iterate over MST edges and try to replace them one by one and at the end we should
+    check that the new cost = the MST_cost.
