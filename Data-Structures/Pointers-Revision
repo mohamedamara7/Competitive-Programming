@@ -64,3 +64,5 @@ the actual struct in head, you'd have to copy the whole value of the struct with
 had before; it's just a copy. The original one is still stored in memory, not being used, and still being pointed to by that struct with id=6. If by any chance you 
 had some other variable sixth_node, its attribute next wouldn't be pointing to head. And you can make the head point to null.
 https://www.quora.com/Why-should-the-first-node-the-head-of-a-linked-list-be-declared-as-a-pointer-rather-than-as-an-object-of-the-structure-or-class
+
+--When we overload operator[], We must return by reference in function because an expression like “arr[i]” can be used an lvalue.
