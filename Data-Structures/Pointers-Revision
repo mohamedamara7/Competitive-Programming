@@ -1,0 +1,66 @@
+-When we declare an array the compiler creates an internal pointer with its name which stores the array's starting address.
+int arr[5]{1,2,3,4,5} -> &arr[0]=arr , *arr=arr[0]=1 , *(arr+2)=arr[2] and so on...
+
+-int* ptr=&arr[0] or int* ptr=arr now we can use ptr as the array name and make any operation so ptr[i] is the same as arr[i] but the only difference is we can increment
+and decrement ptr and change the stored adress in it while we can't do the same with the array name(compile error).
+
+-Const and pointer
+  int* - pointer to int
+  int const * - pointer to const int
+  int * const - const pointer to int
+  int const * const - const pointer to const int
+
+Now the first const can be on either side of the type so:
+  const int * == int const *
+  const int * const == int const * const
+
+--Alias(just another name for the variable):
+int &x=y; now y,x looks at the same area in the memory. no alias for constant and pointers except the alias is constant numbers so it can accept constant numbers.
+
+--Dynamic Memory:
+refers to performing memory allocation manually by a programmer. Dynamically allocated memory is allocated on Heap, and non-static and local variables get memory 
+allocated on Stack. One use of dynamically allocated memory is to allocate memory of variable size, which is not possible with compiler allocated memory. The most 
+important use is the flexibility provided to programmers. We are free to allocate and deallocate memory whenever we need it and whenever we don’t need it anymore.
+There are many cases where this flexibility helps. Examples of such cases are Linked List, Tree, etc. For normal variables like “int a”, “char str[10]”, etc, memory is 
+automatically allocated and deallocated. For dynamically allocated memory like “int *p = new int[10]”, it is the programmer’s responsibility to deallocate memory when no 
+longer needed. If the programmer doesn’t deallocate memory, it causes a memory leak (memory is not deallocated until the program terminates). 
+
+C uses the malloc() and calloc() function to allocate memory dynamically at run time and uses a free() function to free dynamically allocated memory. C++ supports these 
+functions and also has two operators new and delete, that perform the task of allocating and freeing the memory in a better and easier way.
+
+new operator: The new operator denotes a request for memory allocation on the Free Store. If sufficient memory is available, a new operator initializes the memory and 
+returns the address of the newly allocated and initialized memory to the pointer variable.
+Syntaxes for new:
+1-pointer-variable = new data-type;                                         ex: int *p = NULL; p = new int; or int *p = new int;
+2-pointer-variable = new data-type(value);                                  ex: int *p = new int(25);
+3-pointer-variable = new data-type[size];   Allocating a block of memory    ex: int *p = new int[10];
+Dynamically allocates memory for 10 integers continuously of type int and returns a pointer to the first element of the sequence, which is assigned top(a pointer). p[0] 
+refers to the first element, p[1] refers to the second element, and so on. Like an array but it's in the heap not stack but should dealocate by the programmer.
+
+delete operator
+Since it is the programmer’s responsibility to deallocate dynamically allocated memory, programmers are provided delete operator in C++ language. 
+Syntaxes for delete:
+1-delete pointer-variable;                                                  ex: delete p;
+3-delete[] pointer-variable;                Release a block of memory       ex: delete[] p;
+
+Note: best practice is to set the deleted pointer to null after deleting it to save yourself from error when double deleting 
+https://stackoverflow.com/questions/1931126/is-it-good-practice-to-null-a-pointer-after-deleting-it
+
+
+
+
+For DS that contains nodes:
+1-Why next is a pointer?
+It's not just better, it's the only possible way.
+If you stored a Node object inside itself, what would sizeof(Node) be? It would be sizeof(int) + sizeof(Node), which would be equal to sizeof(int) + (sizeof(int) + 
+sizeof(Node)), which would be equal to sizeof(int) + (sizeof(int) + (sizeof(int) + sizeof(Node))), etc. to infinity. An object like that can't exist. It's impossible.
+And to make the next can point to NULL.
+https://stackoverflow.com/questions/29543780/why-do-linked-lists-use-pointers-instead-of-storing-nodes-inside-of-nodes
+
+2-Why we declare the head and root as pointer not an object?
+Let's say you have a linked list with ids ranging from 0 to 9. id=0 points to id=1; id=2 points to id=3 and so on. If you start your head at the first struct (id=0) 
+and want to change the head to some other struct (say id=7), it's very straightforward. head will just point to another memory address. On the other hand, If you had 
+the actual struct in head, you'd have to copy the whole value of the struct with id=7 to change the first element of your list. But that's not the original struct you 
+had before; it's just a copy. The original one is still stored in memory, not being used, and still being pointed to by that struct with id=6. If by any chance you 
+had some other variable sixth_node, its attribute next wouldn't be pointing to head. And you can make the head point to null.
+https://www.quora.com/Why-should-the-first-node-the-head-of-a-linked-list-be-declared-as-a-pointer-rather-than-as-an-object-of-the-structure-or-class
