@@ -1,0 +1,30 @@
+
+Bitonic Traveling Salesman Problem: (check 9.3 in cp3 for more illustration)
+We can express the problem as we have 2 paths the upper and lowen ones. The upper starts at vertex 0 and ends at vertex n-1 the lowe starts at n-1 and ends at 0. At each
+we compare between adding a node v(0<v<n-1) to the upper path and extend it or to the lower to extend it. The base case is reaching the last node which is n-1 so it's at
+v=n-1 and we need two variables p1,p2 represent the last chosen node in upper path and lower path. p1 is the end of upper and p2 is the start of lower
+1-Sort the vertices by x-coordinates (and if tie, by y-coordinates) and apply apsp.
+2-Find the minimum between extend the lower path or extend the upper path.
+3-Base case is v=n-1.
+
+double dp1(int v, int p1, int p2) //(1,0,0)
+{
+    if(v==n-1)
+        return d[p1][v]+d[v][p2];
+    if(~memo[v][p1][p2])
+        return memo[v][p1][p2];
+    return memo[v][p1][p2]=min(d[p1][v]+dp1(v+1,v,p2),dp[v][p2]+dp1(v+1,p1,v)); 
+}
+
+The previous code complexity is o(n^3) which can be reduced to o(n^2) by dropping v parameter and deducing it from p1,p2 as new_v=1+v and v=max(p1,p2).
+
+double dp1(int p1, int p2) //(1,0,0)
+{
+    int v=1+max(p1,p2);
+    if(v==n-1)
+        return d[p1][v]+d[v][p2];
+    if(~memo[v][p1][p2])
+        return memo[v][p1][p2];
+    return memo[v][p1][p2]=min(d[p1][v]+dp1(v+1,v,p2),dp[v][p2]+dp1(v+1,p1,v)); 
+}
+Ex: UVa 01347(Basic), UVa 01096.
