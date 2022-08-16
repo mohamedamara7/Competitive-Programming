@@ -25,6 +25,6 @@ double dp1(int p1, int p2) //(1,0,0)
         return d[p1][v]+d[v][p2];
     if(~memo[v][p1][p2])
         return memo[v][p1][p2];
-    return memo[v][p1][p2]=min(d[p1][v]+dp1(v+1,v,p2),dp[v][p2]+dp1(v+1,p1,v)); 
+    return memo[p1][p2]=min(d[p1][v]+dp1(v,p2),dp[v][p2]+dp1(p1,v)); 
 }
 Ex: UVa 01347(Basic), UVa 01096.
