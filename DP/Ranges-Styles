@@ -4,17 +4,145 @@ We use dp in minimize ,maximize ,counting and calculating problems.
 If we have an array: [1 7 2 5 3 9] the anser may be 7 5 3
                      [0 1 0 1 1 0]
 -Problems like knapsack or LCS or LIS can be solved using this style. 
--In LIS the function parameters are (Cur_idx,prev), prev may be a number or index. if the array contains
-negative or very big values prev should be an index. If the numbers in array are very big we should use prev as a number.
+-Knapsack solution:
+1-Top down:
+long long knapsack(int i,int cur_w)
+{
+    if(cur_w>W)
+        return -(1e11)-1;
+    if(i==n)
+        return 0;
+    if(~memo[i][cur_w])
+        return memo[i][cur_w];
+    return memo[i][cur_w]=max(v[i]+knapsack(i+1,cur_w+w[i]),knapsack(i+1,cur_w));
+}
+2-Bottom up with O(N^2) space complexity:
+long long dp[n][W+1];
+memset(dp,0,sizeof(dp));
+for(int i=n-1;i>=0;i--)
+{
+    for(int j=0;j<W+1;j++)
+    {
+        if(i+1==n)
+            dp[i][j]=max(v[i]+static_cast<long long>(j+w[i]>W?-(1e11)-1:0),static_cast<long long>(0));
+        else
+            dp[i][j]=max(v[i]+static_cast<long long>(j+w[i]>W?-(1e11)-1:dp[i+1][j+w[i]]),dp[i+1][j]);
+    }
+}
+3-Bottom up with O(2*W) space complexity:
+long long dp[2][W+1];
+//dp[0] cur, dp[1] prev
+memset(dp,0,sizeof(dp));
+for(int i=n-1;i>=0;i--)
+{
+    for(int j=0;j<W+1;j++)
+    {
+        if(i+1==n)
+            dp[0][j]=max(v[i]+static_cast<long long>(j+w[i]>W?-(1e11)-1:0),static_cast<long long>(0));
+        else
+            dp[0][j]=max(v[i]+static_cast<long long>(j+w[i]>W?-(1e11)-1:dp[1][j+w[i]]),dp[1][j]);
+    }
+    for(int j=0;j<W+1;j++)
+    {
+        dp[1][j]=dp[0][j];
+        dp[0][j]=0;
+    }
+}
+cout<<dp[1][0];
+4-Bottom up with O(W) space complexity:
+long long dp[W+1];
+memset(dp,0,sizeof(dp));
+for(int i=n-1;i>=0;i--)
+{
+    for(int j=0;j<W+1;j++)
+    {
+        if(i+1==n)
+            dp[j]=max(v[i]+static_cast<long long>(j+w[i]>W?-(1e11)-1:0),static_cast<long long>(0));
+        else
+            dp[j]=max(v[i]+static_cast<long long>(j+w[i]>W?-(1e11)-1:dp[j+w[i]]),dp[j]);
+    }
+}
+cout<<dp[0];
+
+
+There's another variation of knapsack where the weight is very big so we can't save it in array like: https://atcoder.jp/contests/dp/tasks/dp_e?lang=en
+The idea is we will loop on the values where MIN_v<=i<=MAX_v and for every i we will check if there's items which its sum of values equal i and their weights<W(Take or 
+leave DP).
+
+#include <bits/stdc++.h>
+#define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
+using namespace std;
+
+int n,w;
+int weights[100],values[100];
+long long memo[100][100001];
+long long dp(int idx,int value)
+{
+    if(idx>=n)
+        return value==0?0:int(1e9)+1;
+    if(~memo[idx][value])
+        return memo[idx][value];
+    return memo[idx][value]=min(weights[idx]+dp(idx+1,value-values[idx]),dp(idx+1,value));
+}
+int main()
+{
+    fastIO();
+    memset(memo,-1,sizeof memo);
+    cin>>n>>w;
+    int mn_v=1e3,mx_v=0,mn_w=w;
+    for(int i=0;i<n;i++)
+    {
+        cin>>weights[i]>>values[i];
+        mn_v=min(mn_v,values[i]);
+        mx_v+=values[i];
+    }
+    for(int i=mx_v;i>=mn_v;i--)
+    {
+        long long temp=dp(0,i);
+        if(temp<=w)
+        {
+            cout<<i;
+            return 0;
+        }
+    }
+    cout<<0;
+    return 0;
+}
+
+
+-In LIS the function parameters are (Cur_idx,prev), prev may be a number or index. if the array contains negative or very big values prev should be an index. If the 
+array length is very big we should use prev as a number.
+
+int LIS(int idx,int prev) //calling with LIS(0,INT_MIN)
+{
+    if(idx==n)
+        return 0;
+    if(~memo[idx][prev])
+        return memo[idx][prev];
+    int ans=LIS(idx+1,prev);
+    if(prevarr[idx]>=prev)
+        ans=max(ans,1+LIS(idx+1,arr[idx]));
+    return memo[idx][prev]=ans;
+}
+To deal with prev as an index here's the solution: https://leetcode.com/problems/longest-increasing-subsequence/submissions/
+
 -In LCS we make take or leave but on 2 strings at the same time. abdc       abc
                                                                  1101       111
-so we have 4 choices: 
+so we have 3 choices: 
 1-Take Take: when the crosponding characters are the same. 1+dp(i+1,j+1)
 if the crosponding characters aren't the same:
 2-Take leave: dp(i,j+1)
 3-leave Take: dp(i+1,j)
-4-leave leave: dp(i+1,j+1) and the difference between it and take take is that we won't add when to the recursive call. We can ignore this case as when we call 
-take leave or leave take in the next state of each one they will call leave leave.
+
+int LCS(int i,int j) //Calling with LCS(0,0)
+{
+    if(i>=s.size()||j>=t.size())
+        return 0;
+    if(s[i]==t[j])
+        return 1+LCS(i+1,j+1);
+    return max(LCS(i,j+1),LCS(i+1,j));
+}
+
 
 -In coins(UVA 147), we can take more than one. 5 10 20 50 100 200 500 1000 2000 5000 10000 
                                                2 4  0  0  0    0   0   0    0    0     0
@@ -25,12 +153,12 @@ example:
 portion of the old code:
 
 int cnt=dp(idx+1,rem),temp=rem;
-    while(temp-coins[idx]>=0)
-    {
-        cnt+=dp(idx+1,temp-coins[idx]);
-        temp-=coins[idx];
-    }
-    return memo[idx][rem]=cnt;
+while(temp-coins[idx]>=0)
+{
+    cnt+=dp(idx+1,temp-coins[idx]);
+    temp-=coins[idx];
+}
+return memo[idx][rem]=cnt;
 
 after pushing loop to a paremeter:
 
