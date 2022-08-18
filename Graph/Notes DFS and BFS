@@ -9,20 +9,23 @@ but it will give us TLE). Can we avoid repetition in calculations by using DP? t
 topological ordering must exists which means that there should not be any cycles. However, in this case, because of the back edges, there is a cycle. 
 Therefore, DP cannot be used. 
 DFS with memorization
-If DFS is used with memorization, which is what the above code does, memorization will make it run faster, but will sometimes give the wrong answer. This is because, for any index into arr[], it will memorize the shortest distance to the end, but memorized only for the first path to get to that index. For another later path that gets to that same index, there may be a shorter path from that index to the end, but that shorter path will never be found because the distance to the end has already been memorized, and memorized values are never modified or updated. This can be illustrated with the example arr[] of:
-[10, a, b, 20, 10, c, d, 20]
-The values a,b,c,d are arbitrary values that are not important to this example as long as they are NOT duplicates of 10 or 20. The wrong answer occurs because a wrong minimum path to the end is memorized for the 10 at index 4.
-
+If DFS is used with memorization memorization will make it run faster, but will sometimes give the wrong answer. This is because, for any index into arr[], it will 
+memorize the shortest distance to the end, but memorized only for the first path to get to that index. For another later path that gets to that same index, there may be 
+a shorter path from that index to the end, but that shorter path will never be found because the distance to the end has already been memorized, and memorized values are 
+never modified or updated. This can be illustrated with the example arr[] of: [10, a, b, 20, 10, c, d, 20]
+The values a,b,c,d are arbitrary values that are not important to this example as long as they are NOT duplicates of 10 or 20. The wrong answer occurs because a wrong 
+minimum path to the end is memorized for the 10 at index 4.
 The code will do DFS with recursively trying the +1 jumps first. This will result in the partial path of indexes:
 ......+1.......+1.......+1........+1.......
 0(10) --> 1(a) --> 2(b) --> 3(20) --> 4(10)
-From the 10 at index 4, this will then find that the shortest path to the end is to do +1 jumps until the end, which is 3 jumps, which is the value that will be memorized for the 10 at index 4. From the 10 at index 4, doing a -1 jump back to the 20 at index 3 then doing an == jump to the end, is NOT a possible path at this time, because the partial path has already visited the 20 at index 3, so index 3 cannot be re-used when finding a path to the end.
-
-Later, when trying an == jump to same values from the 10 at index 0, to the 10 at index 4, with the partial path:
+From the 10 at index 4, this will then find that the shortest path to the end is to do +1 jumps until the end, which is 3 jumps, which is the value that will be memorized
+for the 10 at index 4. From the 10 at index 4, doing a -1 jump back to the 20 at index 3 then doing an == jump to the end, is NOT a possible path at this time, because 
+the partial path has already visited the 20 at index 3, so index 3 cannot be re-used when finding a path to the end. Later, when trying an == jump to same values from the
+10 at index 0, to the 10 at index 4, with the partial path:
 ......==.......
 0(10) --> 4(10)
-the code will then use the memorized value of 3 for the 10 at index 4, instead of testing possible paths to the end. Therefore using memorization blocks the code from finding the shorter path of a -1 jump back to the 20 at index 3, then a == jump to the end.
-
-In general when using DFS with memorization to find shortest paths, when there are multiple paths to get to or from a location, and the path to a location can possibly block a path from a location, then the DFS can result in wrong answers. In these cases, a BFS should be used to get the correct answer.
-
-This is NOT a problem to solve with DFS with memorization.
+the code will then use the memorized value of 3 for the 10 at index 4, instead of testing possible paths to the end. Therefore using memorization blocks the code from 
+finding the shorter path of a -1 jump back to the 20 at index 3, then a == jump to the end.
+In general when using DFS with memorization to find shortest paths, when there are multiple paths to get to or from a location, and the path to a location can possibly 
+block a path from a location, then the DFS can result in wrong answers. In these cases, a BFS should be used to get the correct answer. This is NOT a problem to solve
+with DFS with memorization.
