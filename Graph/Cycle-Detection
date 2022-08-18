@@ -1,0 +1,23 @@
+There are several methods to detect cycles in directed or in directed graphs:
+1-UnionFind: if we try to union an edges and the 2 ends belongs to the same root then there's a cycle.
+2-kahn's algorithm: if the topsort have number of nodes less than the total number of nodes then there's a cycle.
+3-DFS: if we try to visit a node that visited and we arn't the parent of this node then there's a cylcle.
+bool cylce(int node,int par=-1)
+{
+    vis[node]=1;
+    for(int i=0;i<adjList[node];i++)
+    {
+        if(adjList[node][i]==par) //As if it's the parent then it should be visited before
+            continue;
+        if(vis[adjList[node][i]])
+            return true;
+        if(cylce(adjList[node][i],node))
+            return true;
+    }
+    return false;
+}
+
+
+If we want to detect -ve cycle we can use FW(discussed it before in FW) or Bellman-ford(didn't study it yet).
+
+If we want to detect +ve cycle we can flip the sign of each edge and then detect -ve cycle.
