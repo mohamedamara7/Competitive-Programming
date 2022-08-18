@@ -36,6 +36,7 @@ void tracing(int idx,int mask) //calling with TSP(0,0|(1<<0)) or TSP(0,1) and we
         }
 }
 
+The complexity is O((n*2^n)*n)=O(n^2 * 2^n).
 sometimes we need to add an option to return to the starting node early the best way to do this is too intialize ans with adjMat[idx][0] rather than INT_MAX.
 
 
