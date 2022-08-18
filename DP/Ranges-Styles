@@ -166,6 +166,22 @@ return memo[idx][rem]=dp(idx+1,rem)+dp(idx,rem-coins[idx]);
 
 We reduce the complexity from O(idx*(max_coins)^2) to O(idx*max_coins).
 
+Another variation of coin problem where we need to compute the minimum number of coins that its sum equals x cents.
+
+int mn(int val)
+{
+    if(val==0)
+        return 0;
+    if(val<0)
+        return 1e9;
+    if(!memo[val])
+        return memo[val];
+    int ans=INT_MAX;
+    for(int i=0;i<n;i++)
+        ans=min(ans,1+mn(val-coins[i]));
+    return memo[val]=ans;
+}
+
 
 ---Consecutive Ranges Style:
 If we have an array of integers or characters and we want to divide it to set of groups according to a certain criteria.
