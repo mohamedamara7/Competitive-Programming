@@ -1,1 +1,56 @@
+We discussed Top down approach in Ranges-Style which was O(N^2) the bottom up idea is if we are at index i and arr[i] is greater than previous elements called M then
+LIS[i] equals the greater LIS length for these elements(assume it's index is j) and the par[i] is j. We intialize par array with -1 means the element has no parent to
+stop iterating when reaching parent value of -1.
 
+vector<int>arr(n),LIS(n,0),par(n,-1);
+LIS[0]=1,par[0]=-1;
+int mx_idx=0;
+for(int i=1;i<n;i++)
+{
+    int prev_idx=i;
+    for(int j=0;j<i;j++)
+    {
+        if(arr[i]>arr[j]&&LIS[prev_idx]<LIS[j])
+            prev_idx=j;
+    }
+    LIS[i]=LIS[prev_idx]+1;
+    par[i]=(prev_idx==i?-1:prev_idx);
+    if(LIS[i]>LIS[mx_idx])
+        mx_idx=i;
+}
+while(mx_idx!=-1)
+{
+    cout<<arr[mx_idx]<<" ";
+    mx_idx=par[mx_idx];
+}
+
+There's another solution for LIS with complexity O(n*logn). The idea is: we will create an array with length n called LIS where the index i represents a LIS with length
+i+1 and the value represents the best last real index(index of an element in the original array) of a LIS with length i. What does best mean? if we have 2 LIS with length 4
+1 2 3 4, 5 6 7 15 the best means we will store the index of 4 not 15 because this will open more options in the feature. And for every element in arr we can make a BS
+over LIS to find its position and the condition of BS is arr[i]>arr[LIS[mid]] then l=mid and at the end r will point to its true position in LIS.
+
+vector<int>arr(n),LIS(n+1),par(n,-1);
+LIS[0]=0; //index of first element in arr
+int cur_len=1;
+for(int i=1;i<n;i++)
+{
+    int l=0,r=cur_len,mid;
+    while(r>l+1)
+    {
+        mid=(l+r)/2;
+        if(arr[i]>arr[LIS[mid]])
+            l=mid;
+        else
+            r=mid;
+    }
+    par[i]=r==0?-1:LIS[r-1];
+    LIS[r]=i;
+    if(r==cur_len)
+        cur_len++;
+}
+int idx=LIS[cur_len-1];
+while(idx!=-1)
+{
+    cout<<arr[idx]<<" ";
+    idx=par[idx];
+}
