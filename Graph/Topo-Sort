@@ -1,0 +1,63 @@
+Topologica sorting:
+The only type of graph that has a valid topological ordering is directed acyclic graph (DAG). If the graph has a cycle we also can find a topological ordering but it's 
+not valid. The graph may have more than one valid topological ordering. We can detect if there's a cycle in a graph using tarjan's algo or DFS(and check that all nodes
+are visited). There's 2 methods to find the toposort:
+1-DFS:
+DFS always find a toposort even if the graph is cyclic.
+
+void dfs(int node)
+{
+	visited[node] = true;
+
+	rep(i, adj[node])
+	{
+		int child = adj[node][i];
+		if (!visited[child])	// To avoid cyclic behavior
+			dfs(child);
+	}
+
+	topsort.push_back(node);	// DAG
+}
+
+If the graph is unconnected we should add these nodes to the end of topsort vector. At the end we need to reverse the topsort vector.
+
+
+2-Khan's algorithm:
+The intuition behind kahn's aglorithm is to repeatedly remove nodes without any dependencies from the graph and add them to the topological ordering. As nodes without 
+dependencies(and their outgoing edges) are removed from the graph, new nodes without dependencies should become free. We repet removing nodes without dependencies from 
+the graph until all nodes are processed, or a cycle is discovered.
+Steps:
+1-Calc the in-degree for each node in adjList.
+2-Add to a queue all the nodes with indegree=0.
+3-Iterate until the queue is empty and at each step pop a node from the queue and add it to the toposort vector and the reduce the degree for each affected node and if we
+detect that the degree of a node becomes 0 we add it to the queue.
+4-If the length of the toposort vector not equal the total number of nodes then there's a cycle in the graph.
+As we see in step 4 Khan's algorithm detectes the cycle in the graph
+
+vector<int> toposort(vector<vector<int>>& adjList)
+{
+    int n=adjList.size();
+    vector<int> inDegree(n,0),topsort;
+    for(int i=0;i<n;i++)
+        for(int j=0;j<adjList[i].size();j++)
+            inDegree[adjList[i][j]]+=1;
+    queue<int>q;
+    for(int i=0;i<n;i++)
+        if(inDegree[i]==0)
+            q.push(i);
+    while(!q.empty())
+    {
+        int cur=q.front();
+        q.pop();
+        topsort.push_back(cur);
+        for(int j=0;j<inDegree[cur];j++)
+        {
+            inDegree[adjList[cur][j]]-=1;
+            if(inDegree[adjList[cur][j]]==0)
+                q.push(adjList[cur][j]);
+        }
+    }
+    if(topsort.size()!=n) //there's a cycle
+        return vector<int>();
+    return topsort;
+}
