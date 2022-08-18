@@ -1,3 +1,43 @@
+TSP:
+We start at a node and we want to visit all other nodes with minimum cost. The brute force is finding premutation of n-1 nodes which is O((n-1)!).
+DP solution:
+First we should have shortest path between each nodes so we will apply FW(APSP). We should know if we visited a certain node or no? we will use a mask and do bitwise 
+operations over it and we will go from index idx to all other unvisited nodes and choose the minimum cost. But is this problem contain intersected subproblems? if we
+have 2 paths 0-1-2-3......-0,0-2-1-3......-0 the 2 paths stops at node 3 and the problem now is the minimum cost to go from node 3 to 0 using all unvisited nodes which
+is the same problem in the 2 paths.
+
+int adjMat[n][n];
+int memo[n][(1<<n)];
+int TSP(int idx,int mask) //calling with TSP(0,0|(1<<0)) or TSP(0,1) and we assume the beginning node is 0
+{
+    if(idx==((1<<n)-1))
+        return adjMat[idx][0];
+    if(~memo[idx][mask])
+        return memo[idx][mask];
+    int ans=INT_MAX;
+    for(int i=0;i<n;i++)
+        if((mask&(1<<i))==0)
+        {
+            ans=min(ans,adjMat[idx][i]+TSP(i,mask|(1<<i)));
+        }
+    return memo[idx][mask]=ans;
+}
+
+void tracing(int idx,int mask) //calling with TSP(0,0|(1<<0)) or TSP(0,1) and we assume the beginning node is 0
+{
+    if(idx==((1<<n)-1))
+        return;
+    for(int i=0;i<n;i++)
+        if((mask&(1<<i))==0&&TSP(idx,mask)==adjMat[idx][i]+TSP(i,mask|(1<<i)))
+        {
+            cout<<i<<" ";
+            tracing(i,mask|(1<<i));
+            return;
+        }
+}
+
+sometimes we need to add an option to return to the starting node early the best way to do this is too intialize ans with adjMat[idx][0] rather than INT_MAX.
+
 
 Bitonic Traveling Salesman Problem: (check 9.3 in cp3 for more illustration)
 We can express the problem as we have 2 paths the upper and lowen ones. The upper starts at vertex 0 and ends at vertex n-1 the lowe starts at n-1 and ends at 0. At each
