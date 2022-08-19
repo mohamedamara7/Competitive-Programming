@@ -69,7 +69,8 @@ vector<int> SSSP(vector<vector<pair<int,int>>> adjList)
     for(int i=0;i<n;i++)
     {
         for(int j=0;j<adjList[topSort[i]].size();j++)
-            dis[adjList[topSort[i]][j]]=min(dis[adjList[topSort[i]][j]],dis[topSort[i]]+adjList[topSort[i]][j]);
+            dis[adjList[topSort[i]][j].first]=min(dis[adjList[topSort[i]][j].first],dis[topSort[i]]
+                                                  +adjList[topSort[i]][j].second);
     }
     return dis;
 }
