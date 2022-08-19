@@ -29,8 +29,8 @@ i+1 and the value represents the best last real index(index of an element in the
 1 2 3 4, 5 6 7 15 the best means we will store the index of 4 not 15 because this will open more options in the feature. And for every element in arr we can make a BS
 over LIS to find its position and the condition of BS is arr[i]>arr[LIS[mid]] then l=mid and at the end r will point to its true position in LIS.
 
-vector<int>arr(n),LIS(n),par(n,-1);
-LIS[0]=0; //index of first element in arr
+vector<int>arr(n),LIS(n),par(n,-1),LISatEachElement(n);
+LIS[0]=0,LISatEachElement[0]=1; //index of first element in arr
 int cur_len=1;
 for(int i=1;i<n;i++)
 {
@@ -45,6 +45,7 @@ for(int i=1;i<n;i++)
     }
     par[i]=r==0?-1:LIS[r-1];
     LIS[r]=i;
+    LISatEachElement[i]=r+1;
     if(r==cur_len)
         cur_len++;
 }
