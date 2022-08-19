@@ -54,3 +54,5 @@ while(idx!=-1)
     cout<<arr[idx]<<" ";
     idx=par[idx];
 }
+
+Note: for calculating LDS we will iterate on the main array from right to left and calculate LIS.
