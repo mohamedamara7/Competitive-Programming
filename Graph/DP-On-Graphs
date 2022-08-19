@@ -1,0 +1,78 @@
+General note on DP: if the state space contains a cycle which means for example solution of DP(i,j) depeneds on the solution of DP(i+1,j+1) and solution of DP(i+1,j+1) 
+depeneds on the solution of DP(i,j) then the dp will give us a wrong answer. And that's why we don't use visited array with DP because we will use it with DAG state space
+only. If we use visited array with DP this will called DFS+Memomization which usually gives WA and we discussed it in details in Notes DFS and BFS file. Usually, the 
+problem which in original its state space isn't DAG to be solved by DP a new variable should be added to eliminate the cycle.
+
+From the previous note if we want to run DP on a graph it should be a DAG graph. There's a lot of applications on DP on Graphs.
+
+1-Counting number of paths to reach a certain node:
+https://atcoder.jp/contests/dp/tasks/dp_h?lang=en
+in this problem we have 2 directions and these 2 won't make any cycles so we can use DP.
+#include <bits/stdc++.h>
+#define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
+using namespace std;
+
+int h,w,mod=1e9+7;
+char arr[1000][1000];
+int memo[1000][1000];
+int paths(int i,int j)
+{
+    if(i<0||i>=h||j<0||j>=w||arr[i][j]=='#')
+        return 0;
+    if(i==h-1&&j==w-1)
+        return 1;
+    if(~memo[i][j])
+        return memo[i][j];
+    return memo[i][j]=paths(i,j+1)%mod+paths(i+1,j)%mod;
+}
+int main()
+{
+    fastIO();
+    cin>>h>>w;
+    memset(memo,-1,sizeof(memo));
+    for(int i=0;i<h;i++)
+        for(int j=0;j<w;j++)
+            cin>>arr[i][j];
+    cout<<paths(0,0)%mod;
+    return 0;
+}
+
+so the general algo is:
+int cnt(int node)
+{
+    if(node==dest)
+        return 1;
+    if(~memo[node])
+        return memo[node];
+    int ans=0;
+    for(int i=0;i<adjList[node].size();i++)
+        ans+=cnt(adjList[node][i]);
+    return memo[node]=cnt;
+}
+
+The bottom up approach of this problem is after calc the topsort we will start from the destination and keep visiting all the nodes before it in the topsort which means
+we will iterate on the topsort from right to left and the base case is cnt[dest]=1 and at each node cnt[i]=sum(cnt[children of i]).
+
+
+2-SSSP on a DAG:
+We can use dijkstra with complexity O(E*logv) but we can make a benefit from topological ordering in DAG and calc SSSP with complexity O(E+V).
+Steps:
+1-Calculate topological order of DAG.
+2-Iterare over the toposort and at each element relax its childrens.
+
+vector<int> SSSP(vector<vector<pair<int,int>>> adjList)
+{
+    int n=adjList.size();
+    vector<int> topSort=topoSort(adjList);
+    vector<int> dis(n,INT_MAX);
+    dis[0]=0;
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<adjList[topSort[i]].size();j++)
+            dis[adjList[topSort[i]][j]]=min(dis[adjList[topSort[i]][j]],dis[topSort[i]]+adjList[topSort[i]][j]);
+    }
+    return dis;
+}
+
+If we want to calc the longest path in DAG we can use FW(MAXImax) or using SSSP on a DAG(and instead of min we will use max or we can negate each edge and then find 
+minimum distance and negate it again to be positive).
