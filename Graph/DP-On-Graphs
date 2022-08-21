@@ -77,3 +77,9 @@ vector<int> SSSP(vector<vector<pair<int,int>>> adjList)
 
 If we want to calc the longest path in DAG we can use FW(MAXImax) or using SSSP on a DAG(and instead of min we will use max or we can negate each edge and then find 
 minimum distance and negate it again to be positive).
+
+Notes: 
+sometimes we need to convert the graph to DAG to solve the problem. Some problems give 2 or more constraints like distance and time we can use time to convert the
+graph to DAG. As time is a diminishing resource, we will never encounter a cyclic situation.
+https://www.spoj.com/problems/FISHER/
+https://www.spoj.com/submit/FISHER/id=29958023
