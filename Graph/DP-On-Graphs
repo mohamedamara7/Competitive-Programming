@@ -83,3 +83,5 @@ sometimes we need to convert the graph to DAG to solve the problem. Some problem
 graph to DAG. As time is a diminishing resource, we will never encounter a cyclic situation.
 https://www.spoj.com/problems/FISHER/
 https://www.spoj.com/submit/FISHER/id=29958023
+UVA 11487 also a good example on converting the graph to DAG. You should take advantage of ordering. Can be solved using bottom down using BFS with some modification
+(it will be like dijkstra) or top down with 2 calculating functions and the length will be the variable that will be used to convert to DAG.
