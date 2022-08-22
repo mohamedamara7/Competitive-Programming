@@ -1,0 +1,11 @@
+
+Segment tree data structure solves:
+ 		Given set of intervals (a-b). Then given set of queries, each query is a number, HOW many intervals contain the number?
+
+Segment tree != Interval Tree
+
+Interval tree data structure solves:
+ 	Given set of intervals (a-b). Then given set of queries, each query is an interval, HOW many intervals intersect the given interval?
+ 			If given interval has start = end, then it could solve what Segment tree
+
+Interval tree is extremely efficient in time/memory when moving to higher dimension.
