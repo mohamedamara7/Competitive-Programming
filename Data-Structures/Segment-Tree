@@ -1,0 +1,136 @@
+We use it when there's several queries on an array of different types like sum from i to j and another one requires changing an index k to some value and then
+recalculating sum from i to j. In the first type query we can use prefix sum array but for the second we need to rebuild the prefix array again which takes O(N). 
+Segment tree can solve this problem with lower complexity O(logn). So for range sum qureies if the array is static we will use prefix sum and if it's dynamic we will 
+use segment tree.
+
+Some notes:
+1- We will build the segment tree to solve range sum query and it can be built to solve other queries with some modifications in the code.
+2- We will work with 1-base array and 1-base segment tree for an easier code.
+3- Segment tree is a binary tree. The last level in it contains the element in the array so the array size should = 2^k while k is a natural number. A node in any 
+previous level is the some of its children.
+4- We should diffrentiate between query segment(i-j) and the tree segment(l-r).
+5- While querying we have 3 cases:
+    * The current tree segment doesn't intersect with query segment so we should return 0.
+    * The query segment includes the tree segment so we should return the current node.
+    * Else(there's an intersection with out including) we should diffrentiate the current tree segment into 2 pieces(l-mid,mid+1-r) and returning their sum.
+6- While taking the input of the real array it will be of size n we shloud calc N=2^k and we will build it of size N+1 to make it 1-based and the segment tree array will
+be of size 2N.
+7- The height of the tree is (logN)+1. Number of nodes in the segment tree is: 1+2+4+8+....+N=(1-2^z)/(1-2)->geometric series while Z the number of elements in the eqn
+which is number of levels in the tree which is the height so z=logN+1 ,thus after simplificationing number of nodes in the segment tree 2*N-1 and we want to make it
+ 1-based so it will be 2N.
+9- In tree segment of the each element in the last level l=r=it's index in the real array.
+10- We will use lazy propagation to update a range with a certain value in O(logN) instead of O(N*logN).
+11- Lazy[node]=val means the child of this node must be increased with this val.
+12- We will propagete while query in O(1) and when we update a range we will query as if there's any previous propagation.
+
+
+
+
+#include <bits/stdc++.h>
+#define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
+using namespace std;
+
+class segmentTree{
+private:
+    vector<int> segT,lazy;
+    int N;
+    void build(int node,int l,int r,vector<int> &arr) //O(2N)
+    {
+        if(l==r)
+        {
+            segT[node]=arr[l];// =arr[node-(N-1)]
+            return;
+        }
+        int mid=l+r>>1; //(l+r)/2
+        build(node<<1,l,mid,arr);    //2*node
+        build(node<<1|1,mid+1,r,arr); //2*node+1
+        segT[node]=segT[node<<1]+segT[node<<1|1];
+    }
+    int query(int node,int l,int r,int i,int j) //l-r tree segment, i-j query segment
+    {
+        if(r<i||l>j) //no intersection
+            return 0;
+        if(l>=i&&r<=j)
+            return segT[node];
+        int mid= l+r>>1;
+        return query(node<<1,l,mid,i,j)+query(node<<1|1,mid+1,r,i,j);
+    }
+    void propagate(int node,int l,int r)
+    {
+        int mid= l+r>>1;
+        lazy[node<<1]+=lazy[node];
+        lazy[node<<1|1]+=lazy[node];
+
+        segT[node<<1]=(lazy[node])*(mid-l+1);
+        segT[node<<1|1]=(lazy[node])*(r-mid);
+        lazy[node]=0;
+    }
+    void updateRange(int node,int l,int r,int i,int j,int val)
+    {
+        if(r<i||l>j)
+            return;
+        if(l>=i&&r<=j)
+        {
+            segT[node]+= val*(r-l+1);
+            lazy[node]+=val;
+            return;
+        }
+        propagate(node,l,r);
+        int mid= l+r>>1;
+        updateRange(node,l,mid,i,j,val);
+        updateRange(node,mid+1,r,i,j,val);
+        segT[node]=segT[node<<1]+segT[node<<1|1];
+    }
+public:
+    segmentTree(vector<int> &arr)
+    {
+        N=arr.size()-1;
+        segT.resize(N<<1);
+        lazy=vector<int>(N<<1,0);
+        build(1,1,N,arr);
+    }
+    int query(int i,int j) //O(logN)
+    {
+        return query(1,1,N,i,j);
+    }
+    void updatePoint(int idx,int val) //O(logN)
+    {
+        int node=idx+N-1;
+        segT[node]+=val;
+        while(node>1)
+        {
+            node>>=1; //Divide by 2 to get the parent
+            segT[node]=segT[node<<1]+segT[node<<1|1];
+        }
+    }
+    void updateRange(int i,int j,int val)
+    {
+        updateRange(1,1,N,i,j,val);
+    }
+};
+int main()
+{
+    fastIO();
+    int n,N=1;
+    cin>>n;
+    while(N<n)
+    {
+        N<<=1; //multiplication by 2
+    }
+    vector<int> arr(N+1);
+    for(int i=1;i<=n;i++)
+        cin>>arr[i];
+    //Padding
+    for(int i=n+1;i<=N;i++)
+        arr[i]=0;
+    segmentTree ST(arr);
+
+    int q;
+    cin>>q;
+    while(q--){
+        int l,r;
+        cin>>l>>r;
+        cout<<ST.query(l,r)<<endl;
+    }
+    return 0;
+}
