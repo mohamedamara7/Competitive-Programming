@@ -7,3 +7,4 @@ int cnt=0;
 for(int i=0;i<n;i++)
   arr[i]+=cnt;
   cnt+=arr[i];
+it's the same as applying prefix sum on the new array.
