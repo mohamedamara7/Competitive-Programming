@@ -1,2 +1,9 @@
--An array or string can be sorted in o(n*logn) or in o(n) using frequency matrix.
+-An array or string can be sorted in o(n*logn) or in o(n) using frequency array.
 -The number of subsequences is 2^N and the number of subarrays is N*(N+1)/2.
+
+-If we hava a segment [L-R] sometimes we need to store a certain value in it we can loop from l to r but if we have N segments this might take O(N^2) and give TLE.
+There's a trick to avoid TLE by putting seg[l]+=val,seg[r+1]+= -val and after the queries we can loop over the full and editing it.
+int cnt=0;
+for(int i=0;i<n;i++)
+  arr[i]+=cnt;
+  cnt+=arr[i];
