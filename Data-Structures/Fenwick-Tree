@@ -1,0 +1,125 @@
+Solves part of problems that can be solved by segment tree but it much faster and less memory O(N) -segment tree O(2N)- and small code. The ranges operations tha can be
+implemented by fenwick tree is the reversible operation. if 100 x y=50 where x is an operator and y is a number if we can find y then x is a reversible operator. X may be
++,-,*,/,^. So fenwick tree can't always used for range min/max query but if we always find minimum between [idx,0] it will work.
+https://discuss.codechef.com/t/solving-range-minimum-queries-using-binary-indexed-trees-fenwick-trees/4031/9
+
+A BIT can be operated in one of 3 modes:
+  *Point updates and range queries.
+  *Range updates and point queries(getting the point value).
+  *Range updates and range queries.
+
+1-Point updates and range queries:
+
+#include <bits/stdc++.h>
+#define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
+using namespace std;
+
+class FenwickTree{
+private:
+    vector<int>ft;
+    int N;
+    int pointQuery(int x)
+    {
+        int sum=0;
+        while(x>0)
+        {
+            sum+=ft[x];
+            x-= (x&-x);
+        }
+        return sum;
+    }
+public:
+    FenwickTree(int n)
+    {
+        ft=vector<int>(n+1,0);
+        N=n+1;
+    }
+    int rangeQuery(int a,int b)
+    {
+        return pointQuery(b)-pointQuery(a-1);
+    }
+    void pointUpdate(int x,int val)
+    {
+        while(x<N)
+        {
+            ft[x]+=val;
+            x+=(x&-x);
+        }
+    }
+    int getOrginal(int idx)
+    {
+        return rangeQuery(idx,idx);
+    }
+};
+int main()
+{
+    fastIO();
+    vector<int>v({2,1,8});
+    FenwickTree FT(v.size());
+    for(int i=0;i<v.size();i++)
+        FT.pointUpdate(i+1,v[i]);
+    cout<<FT.getOrginal(1)<<" "<<FT.getOrginal(2)<<" "<<FT.getOrginal(3)<<endl;
+    cout<<FT.rangeQuery(1,3)<<" "<<FT.rangeQuery(2,3)<<endl;
+    FT.pointUpdate(2,5);
+    cout<<FT.getOrginal(1)<<" "<<FT.getOrginal(2)<<" "<<FT.getOrginal(3)<<endl;
+    cout<<FT.rangeQuery(1,3)<<" "<<FT.rangeQuery(2,3)<<endl;
+    return 0;
+}
+
+2-Range updates and point queries(getting the point value):
+
+#include <bits/stdc++.h>
+#define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
+using namespace std;
+
+class FenwickTree{
+private:
+    vector<int>ft;
+    int N;
+public:
+    FenwickTree(int n)
+    {
+        ft=vector<int>(n+1,0);
+        N=n+1;
+    }
+    void pointUpdate(int x,int val)
+    {
+        while(x<N)
+        {
+            ft[x]+=val;
+            x+=(x&-x);
+        }
+    }
+    void rangeUpdate(int l,int r,int val)
+    {
+        pointUpdate(l,val);
+        pointUpdate(r+1,-val);
+    }
+    int pointQuery(int x)
+    {
+        int sum=0;
+        while(x>0)
+        {
+            sum+=ft[x];
+            x-= (x&-x);
+        }
+        return sum;
+    }
+};
+int main()
+{
+    fastIO();
+    vector<int>v({0,0,0});
+    FenwickTree FT(v.size());
+    for(int i=0;i<v.size();i++)
+        FT.pointUpdate(i+1,v[i]);
+    cout<<FT.pointQuery(1)<<" "<<FT.pointQuery(2)<<" "<<FT.pointQuery(3)<<endl;
+    FT.rangeUpdate(1,3,5);
+    cout<<FT.pointQuery(1)<<" "<<FT.pointQuery(2)<<" "<<FT.pointQuery(3)<<endl;
+    FT.rangeUpdate(1,3,-2);
+    cout<<FT.pointQuery(1)<<" "<<FT.pointQuery(2)<<" "<<FT.pointQuery(3)<<endl;
+    return 0;
+}
+
+3-
+https://www.geeksforgeeks.org/binary-indexed-tree-range-update-range-queries/
