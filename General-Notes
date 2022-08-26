@@ -10,7 +10,6 @@ for(int i=0;i<n;i++)
 it's the same as applying prefix sum on the new array.
 
 -If we have a set of numbers and we want to have 2 numbers l1,l2 such that l1+l2=k we can find this 2 numbers in linear time by using a data structure that searches in 
-a constant time and loop over the set and at each number we will search for k-num in the data structure. we may use unordered set or map or even a boolean vector. No need
-for iterating over all the numbers we can iterate over the half of it. Some times the numbers are sorted incresingly and we want l2-l1 to be minimize so we should loop
-from the idx=size/2 to 0 (not the opposite).
+a constant time and loop over the set and at each number we will search for (k-num) in the data structure, we also can iterate until k/2. we may use unordered set or map 
+or even a boolean vector. Some times the numbers are sorted incresingly and we want l2-l1 to be minimize so we should loop from the idx=size/2 to 0 (not the opposite).
 
