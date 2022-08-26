@@ -138,7 +138,7 @@ int main()
 
 -We can use segment tree in other things not only range query. In uva 10909 we want a data structure that can insert and remove element by its orginal position and get
 element by its orginal position and keep updating these position after removing and all these operations should be done by maximum in O(logN). But the elements are 
-sorted increasingly we can use segment tree the leaf nodes will be contain one if the num is in the array, and upper nodes will contain a number indicates that the 
+sorted increasingly we can use set or multi-set or even a segment tree the leaf nodes will be contain one if the num is in the array, and upper nodes will contain a number indicates that the 
 count of numbers in a segment i-j.
 
 #include <bits/stdc++.h>
