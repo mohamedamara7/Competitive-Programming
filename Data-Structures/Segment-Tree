@@ -134,3 +134,96 @@ int main()
     }
     return 0;
 }
+
+
+-We can use segment tree in other things not only range query. In uva 10909 we want a data structure that can insert and remove element by its orginal position and get
+element by its orginal position and keep updating these position after removing and all these operations should be done by maximum in O(logN). But the elements are 
+sorted increasingly we can use segment tree the leaf nodes will be contain one if the num is in the array, and upper nodes will contain a number indicates that the 
+count of numbers in a segment i-j.
+
+#include <bits/stdc++.h>
+#define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
+using namespace std;
+
+int N=2e6;
+int segT[4194305],//2^(ceil(logN)+1) + 1
+lucky[2000001];
+void insert(int val,int node=1,int l=1,int r=4)
+{
+    if(l==r)
+    {
+        segT[node]=1;
+        return;
+    }
+    int mid=(l+r)>>1;
+    if(val<=mid)
+        insert(val,node<<1,l,mid);
+    else
+        insert(val,node<<1|1,mid+1,r);
+    segT[node]=segT[node<<1]+segT[node<<1|1];
+}
+
+void delkTh(int kTh,int node=1,int l=1,int r=4)
+{
+    if(l==r)
+    {
+        segT[node]=0;
+        return;
+    }
+    int mid=(l+r)>>1;
+    if(kTh<=segT[node<<1])
+        delkTh(kTh,node<<1,l,mid);
+    else
+        delkTh(kTh-segT[node<<1],node<<1|1,mid+1,r);
+    segT[node]=segT[node<<1]+segT[node<<1|1];
+}
+int getkTh(int kTh,int node=1,int l=1,int r=4)
+{
+    if(l==r)
+        return l;
+    int mid=(l+r)>>1;
+    if(kTh<=segT[node<<1])
+        return getkTh(kTh,node<<1,l,mid);
+    else
+        return getkTh(kTh-segT[node<<1],node<<1|1,mid+1,r);
+}
+
+int main()
+{
+    fastIO();
+    for(int i=1;i<=N;i+=2)
+        insert(i);
+    lucky[1]=1;
+    int available=N/2; //available indexes
+    for(int idx=2;idx<=available;idx++)
+    {
+        int cur=getkTh(idx),idx_rem=cur;
+        lucky[cur]=1;
+        while(idx_rem<=available)
+        {
+            delkTh(idx_rem);
+            idx_rem+=cur-1;
+            available++;
+        }
+    }
+    int x;
+    while(cin>>x)
+    {
+        bool flag=true;
+        if(x%2!=0)//all lucky numbers are odd (we delete even in first step) and the sum of 2 odds is even. so if x is odd the answer is no.
+        {
+            int m=x/2;
+            for(int i=m;i>=1;i--)
+                if(lucky[i]&&lucky[x-i])
+                {
+                    cout<<x<<" is the sum of "<<i<<" and "<<x-i<<endl;
+                    flag=false;
+                    break;
+                }        
+        }
+        if(flag)
+            cout<<x<<" is not the sum of two luckies!"<<endl;
+    }
+    return 0;
+}
+
