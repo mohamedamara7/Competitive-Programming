@@ -1,0 +1,747 @@
+/*
+ *
+ *
+ ******************************************** Licence *******************************************
+ * 																								*
+ * This File is part of Algorithms Arabic Video Series											*
+ *	Made By Eng Mostafa Saad, Teaching Assistant in FCI - Cairo University						*
+ * 																								*
+ *	Available at My YouTube Channel: http://www.youtube.com/user/nobody123497?feature=mhee		*
+ * 																								*
+ * Feel free to make use of it at anytime, for any reason, in anyway, without any obligations.	*
+ * 																								*
+ * 																								*
+ * In case of finding a mistake, kindly notify me at: mostafa.saad.fci@gmail.com				*
+ * 																								*
+ * Mostafa Saad Ibrahim © 2013																	*
+ * 																								*
+ ************************************************************************************************
+ *
+ *
+ */
+ 
+
+
+/*
+Content:
+- Considerations before Selecting Segment Tree
+- Interval Query in Segment Tree
+- Bracket Expression Problem
+- Maximum Interval Sum Problem
+- Longest Increasing Subsequence Problem
+- Find the first number >=  value
+- Find the smallest number >=  value
+- Coordinate compression Trick
+- Segment Tree with  Lazy Propagation
+- Simple NsqrtN algorithm for interval problems
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Last time, we said we could use a segment tree (segtree) with operations such as
+ *
+ * 		Info Queries
+ * 			HOW many numbers are in given interval?
+ * 			Get Kth item in sorted list
+ *
+ * 		Update Queries
+ * 			Remove kth item in sorted list
+ * 			Insert new element
+ *
+ *
+ * But, most of these operations could be done in similar order using simply c++ multiset!
+ *
+ * Lesson #1
+ * 		Never to use an advanced data structure unless you really need it! Investigate the requests carefully
+ *
+ *
+ * Let's move to a bit more complicated request:
+ * 		Query is: Find the accumulation of numbers in a given range
+ *
+ * 		Now, you can't using multiset to achieve same order. As you need to iterate over elements and sum them
+ *
+ * 		However, if we used segment tree node to express interval sum, segment tree is same code with same good order
+ *
+ * 		So if we faced this problem, we use segment tree? NO
+ *
+ * Lesson #2
+ * 		Consider Input size
+ * 			If number of elements N = 100 is not same as N = 1000 not same as N = 1000000
+ *
+ * 		If for above problem N = 100 and Q = 100, we could use the multiset or any other brute force
+ * 		If N = 10000 and Q = 10000 we need segment tree
+ *
+ * Back to lesson 1
+ * 		You should know that queries are of different type. Each one may force you to use a specific data structure (e.g. range tree not segment tree)
+ * 			Or optimize it more
+ *
+ * 		Info Query
+ * 			Any query that doesn't alter data structure is Info Query
+ * 				E.g. Calculate something over given interval, get Kth ...
+ *
+ * 			Many problems give you the initial input, and then just asks you for information to retrieve
+ *
+ * 		Update Query
+ * 			Any query that alter the data is update query
+ * 				E.g. Remove Position, Remove Interval, Insert element, Insert array, update element, update interval
+ *
+ * 			Typically such queries require updating to the data structure (e.g. segment) and in some cases need efficient handling
+ *
+ * Lesson #3
+ * 		Problem could be 1D or 2D, 3D space ....
+ * 		Different Data structures have different performance
+ *
+ *
+ * Care with what? Given N, what is:
+ * 		Pre-processing Order
+ * 		Each Query Type Order
+ * 		Memory Order
+ *
+ *
+ * 1D segment tree: Pre-processing: O(nlog n), Memory: O(nlog n), Many Queries: O(logn)
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * How is code for a query over interval?
+ * 		It simply traverse to all sub-intervals inside the given interval
+ * 		If sub-interval is totally part of me, we don't call down any more
+ * 		It is important to decide how to merge the 2 sub-calls
+ *
+ *
+ * 	Let's try a problem: Given Array, queries of intervals, find maximum in this interval. (RMQ:  Range Maximum Query problem)
+ */
+
+// Assume we build the tree to have the index of the maximum of an interval:
+int from, to;	// initialize to given query interval
+
+int query(int s = 0, int e = MAX, int p = 1) {
+	if (from <= s && to >= e)
+		return interval[p];
+
+	int mid = (s + e) / 2;
+
+	// Either we are in specific interval, or we are spanned over 2 intervals
+	if (to <= mid)
+		return query(s, (s + e) / 2, 2 * p);
+
+	if (from > mid)
+		return query((s + e) / 2 + 1, e, 2 * p + 1);
+
+	int a = query(s, (s + e) / 2, 2 * p);
+	int b = query((s + e) / 2 + 1, e, 2 * p + 1);
+
+	return input[a] > input[b] ? a : b;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Many classical problems is handled in same way. Just you change base case of build/update and merge in query
+ *
+ * Some classical problems:
+ * 		Range Accumulation, Accumulation Position
+ * 		Max, Min
+ * 		GCD, LCM
+ * 		XOR, AND, OR
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Sometimes, node doesn't contain a simple number, but a simple structure containing different info
+ *
+ * The real art is what is the structure that achieves the target?
+ *
+ * E.g. given bracket expression, and interval queries: Is this interval balanced?
+ * 		(()(())(
+ *
+ * 		Interval(4-7) = (()) = balanced
+ * 		Interval(1-8) = (()(())( = not balanced
+ *
+ * Ok, how do we check a given string balanced?
+ * 		A simple counter, if it is ( we do cnter++, if it is ) we do cnter--
+ * 			cnter-- should never be < 0 or this means we did not find match
+ *
+ * How could this help?
+ * 		Let a node represent 2 numbers: Opened, closed
+ * 			# of Opened brackets that need a close
+ * 			# of closed brackets that need an open
+ *
+ * 			E.g. is interval is ())(()( it will have value: 2, 1
+ *
+ * 		In query, how to merge 2 nodes:
+ * 			The close of 2nd matches some of open of 1st. closed of 1st and opened of 2nd will not be matched
+ *
+ * 				Node P() = (p2.OPENED, p1.CLOSED);
+ *				int dif = p1.OPENED - p2.CLOSED;
+ *				if(dif >= 0)
+ *					P.OPENED += dif;
+ *				else
+ *					P.CLOSED -= dif;
+ *
+ *		If query interval has value (0, 0), we have a balanced interval
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * A bit harder example will be: Given Interval Query, find the sub-interval with maximum sum
+ *
+ * In this case, segment tree is not of one value, but more info needed...How to THINK?
+ */
+
+
+
+
+
+/*
+ * Think as following, if we have an array divided to 2 parts, what is the answer?
+ *
+ * 1- either answer in 1st part
+ * 2- or in second part
+ * 3- or subarray, ends at 1st part and starts with 2nd part
+ *
+ * If we need to handle the 3rd one, we need for each array the best prefix sum and best suffix sum, and simply add them. This is easy
+ *
+ * We need also a variable to indicate the best value inside an interval. Thinking in merge reveals that nothing more is needed
+ */
+
+
+
+
+
+
+/*
+ * 	Per node record 4 values:
+ * 		Interval sum, Interval Best Prefix, Interval Best Suffix, Interval answer
+ *
+ * 		e.g. 1 2 3 -90 4 5 6 -70 8
+ * 			SUM = -131
+ * 			Best Prefix = 1+2+3 = 6
+ * 			Best Suffix = 8
+ * 			Answer: 4+5+6 = 15
+ *
+ * 	How to merge 2 queries.
+ *
+ *		node c;
+ *		c.left = max(a.left, a.sum + b.left);
+ *		c.right = max(b.right, b.sum + a.right);
+ *		c.mid = max(max(a.mid, b.mid), max(a.sum + b.sum, a.right + b.left));
+ *		c.sum = a.sum + b.sum;
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * One more interesting example is finding the longest increasing subsequence of an array. (Prerequisites: Dynamic Programming)
+ * 		The problem has many solutions. An easy DP in O(n^2). An optimization based on binary search in nlogn
+ * 		Segment tree also solves the problem in nlogn in a simple way. We improve DP time using an RMQ described above
+ *
+ * 	Let's first code the direct n^2 DP
+ */
+
+// O(n^2), length[i]: longest seq ENDING at i. This definition is better than STARTing at i
+int solve(int height[], int length[], int n)
+{
+	int mx = 0;
+	lp(i, n)
+	{
+		length[i] = 1;
+		lp(j, i)
+		{
+			if(height[i] > height[j])
+				length[i] = max(length[i], length[j] + 1);
+		}
+		mx = max(mx, length[i]);
+	}
+	return mx;
+}
+
+/*
+ * What does internal loop do:
+ * 		1- find an element less than me in index
+ * 		2- find an element less than me in value
+ * 		3- and has the maximum length
+ *
+ * The first condition is maintained as long we process in order. That is elements after i position is not processed yet.
+ * The real challenge is managing the value/maximum in an efficient way.
+ *
+ * Here is a popular trick. Whenever you need to filter elements based on how is small than you, use the index of array to do that.
+ *
+ * That is, we will consider ever previous element as (height[i], length[i]), such that height[i] is an array index and length[i] is its value
+ * 		Imagine that, after each time we calculate value for it, do: A[ height[i] ] = length[i]
+ *
+ * 	Now, if we are at new i, we should iterate on all elements in range: 0 - height[i]-1, and find maximum
+ * 	This way, we dropped the 2nd condition, and we simply need to find the maximum over a certain range.
+ *
+ */
+
+ int solve(int height[], int n)
+ {
+	int mx = 1;
+
+	lpi(i, 1, n)
+	{
+		int bestPosLen = 1;
+
+		if(height[i] != 0)	// special handling for the smallest entry, 0 in this case
+		{
+			from = 0, to = height[i]-1;
+			bestPosLen = query(0, n-1) + 1;
+		}
+		idx = height[i], val = bestPosLen;
+		update(0, n-1);
+
+		mx = max(mx, bestPosLen);
+	}
+
+	return mx;
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /*
+  * What about: Find the "first" number >= a given value in a given interval?
+  *
+  * We could simply uses RMQ to solve it too. Simply, we search for the most left idx with value >= target value
+  *
+  * In query, recurse on left part, if found return. If not found move to right part.
+  */
+
+
+int query(int node,int l,int r,int i,int j,int val)
+    {
+        if(r<i||l>j)
+            return -1;
+        if(l>=i&&r<=j)
+        {
+            if(segT[node]<val)
+                return -1;
+            while(l!=r)
+            {
+                int mid=(l+r)>>1;
+                if(segT[node<<1]>=val)
+                {
+                    node<<=1;
+                    r=mid;
+                }
+                else
+                {
+                    node=node<<1|1;
+                    l=mid;
+                }
+            }
+            return l;
+        }
+        int mid=(l+r)>>1;
+        int ans=query(node<<1,l,mid,i,j,val);
+        if(ans!=-1)
+            return ans;
+        return query(node<<1|1,mid+1,r,i,j,val);
+    }
+
+int query(int i,int j,int val)
+    {
+        return query(1,1,N,i,j,val);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * In a more advanced case, the node may hold much of data, and you may need to take care of memory issues:
+ *
+ * if we have an array input..query (start, end, value)
+ * 		Find the "smallest" number >= a given value in a given interval?
+ *
+ * In this case, Each node will have a sorted array of its interval.
+ * 		As we have log(n) levels, and each level has n values, we have in total O(nlogn) memory
+ *
+ * As the children node has 2 sorted arrays, we could merge the 2 arrays linearly (use STL merge)
+ * 		As we have log(n) levels, and each level do n operations, we have in total O(nlogn) time
+ *
+ * What about query:
+ * 		After we split, the query to 2 parts: answer is min of return values
+ * 		If interval is fully contained, we binary search to find
+ * 			the smallest number greater than or equal to the value in the sub-array
+ *
+ * 		So order is log^2(n), as we binary search in log(n)
+ *
+ *
+ * So far, we have just info query, if we moved to update query (insert, remove), order will grow
+ * 		As we depend on arrays sort
+ *
+ * 	A work around will be using a balanced tree for each node. Multiset could be used, but will have a long merge time.
+ *
+ *
+ * 	In other similar problems, where node hold sub-array of its range, many advanced data structures could be used
+ * 		It could be another segment tree, or Binary Indexed tree and so on. It depends on the problem
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Co-ordinate compression Trick
+ *
+ * 		Say we are given N pair values, each pair represent time to enter a room, and time to leave it.
+ * 		Given interval query, what is maximum # of people in a time inside the room?
+ * 			N = 10000, A[i] <= 10^9
+ *
+ * 		We need to index in the tree using array values, but values are so big.
+ *
+ * 		Notice that, we care with relative relation between values, not values themselves.
+ *
+ * 		A nice trick is to re number the values, by simply sorting them
+ *
+ * 		E.g. (100, 150) (200, 300), (120, 450), (100, 300)
+ *
+ * 		Sort unique vals : 100, 120, 150, 200, 300, 345
+ * 			Now let 100=0, 120=1, 150=2, 200=3, 300=4, 345=5
+ *
+ * 		So	(0, 2), (3, 4),...
+ *
+ * 		Now use these pairs to mark an interval as occupied.
+ *
+ * 		Now the problem is, find maximum number in a range
+ *
+ * 		However, marking 10000 interval, each may be of width = 20000 is TLE
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Lazy Propagation
+ *
+ *		So far, we expand nodes till reaching the leaf nodes. In this way, we expand everything.
+ *
+ *		If we do a specific index update, typically no problem with full expanding. It is finally O(logn)
+ *
+ *		What if we need to update an interval? E.g. Update interval [3-5] with value 1?
+ *			Now, we need O(nlogn)
+ *
+ *		Sometimes, a parent node holds information that is SAME for all its sub-children
+ *
+ *		In this case, we do lazy propagation. That is we stop at a node, when all children has same value as parent
+ *
+ *		To solve this issue, we add a boolean to our node struct, isMixed
+ *			It indicates if a node has children with different values, or all same.
+ *			If same, and we need to update, we don't propagate
+ *
+ *		In coding, we do so when the query interval fully contains the tree interval
+ *			If interval is constant (!mixed), we update parent node only and return. This way we save propagation time.
+ *
+ *		When a node must go down, we need to be careful. If it is a constant node, we propagate parent node to children
+ *
+ *		Also, careful coding for updating a node after calling its sub-children. A node status is alternating between constant and mixed
+ *
+ *
+ *		Let's try this problem. Given interval queries, increment this interval with one. After all queries, inform us with maximum value for an index
+ *
+ *		That is, say intervals are [3-5], [7, 9], [4-7]
+ *
+ *		Say indices
+ *			0 1 2 3 4 5 6 7 8 9
+ *	[3-5]	0 0 0 1 1 1 0 0 0 0
+ *	[7-9]	0 0 0 1 1 1 0 1 1 1
+ *	[4-7]	0 0 0 1 2 2 1 2 1 1
+ *
+ *	so max value is 2.
+ *
+ *	As you see
+ *		1) query is in style of interval
+ *		2) we could express a node with constant status. That is all children in this node has same max value
+ */
+
+
+
+ typedef pair<int, int> NODE;
+ #define maxFreq	first
+ #define isMixed	second		// For Lazy propagation
+
+ NODE tree[MAX];
+
+ int Enter, Exit;	// given query
+ int S = 0, E;
+
+ void updateLazy(int s = S, int e = E, int p = 1) {
+
+ 	if(Enter > e || Exit < s)	return;		// no intersection
+
+ 	if(Enter <= s && e <= Exit && !tree[p].isMixed)	// tree interval inside query interval. all its children has same value
+ 	{
+ 		tree[p].maxFreq++;
+ 		return;
+ 	}
+
+ 	int mid = (s + e) / 2;
+ 	if(!tree[p].isMixed)
+ 		tree[2*p] = tree[2*p+1] = tree[p];	// propagate
+
+ 	updateLazy(s, mid, 2 * p);
+ 	updateLazy(mid + 1, e, 2 * p + 1);
+
+ 	//Update the function
+ 	tree[p].isMixed = tree[2*p].isMixed || tree[2*p+1].isMixed || tree[2*p].maxFreq != tree[2*p+1].maxFreq;
+ 	tree[p].maxFreq = max(tree[2*p].maxFreq, tree[2*p+1].maxFreq);
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Finally, there is a simple technique that solve many interval queries. Before thinking in advanced data structures, you may use it.
+ *
+ * It simply divides the array to set of blocks, each of size sqrt(N). Then, for each block it computes the target answer.
+ * In query, we simply find the blocks that is part of the interval and get their answer. Careful handling for the array start & end is required.
+ *
+ * E.g., if we need maximum interval query, each block will hold max in this block. Query iterate on m blocks and compute max among them.
+ *
+ * In a mroe advanced case, will be the: Find the "smallest" number >= a given value in a given interval?
+ *
+ * Store in each block a multiset of the numbers in this block. In query time, do lowerbonund in each block and minimize among them.
+ *
+ * To avoid too much processing for the start and end which may not belong to a block. Have other block array but with factor sqrt(n)/4
+ * When u need to handle start and end, call them in the smaller one which will be better than direct iterating on large range < sqrt(n)
+ * Though this trick doesn't affect highly
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ // GCD: http://acm.timus.ru/problem.aspx?space=1&num=1846
+
+int main() {
+#ifndef ONLINE_JUDGE
+	freopen("c.in", "rt", stdin);
+	//freopen(".txt", "wt", stdout);
+#endif
+
+	return 0;
+}
