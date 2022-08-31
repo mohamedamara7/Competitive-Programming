@@ -149,7 +149,7 @@ using namespace std;
 int N=2e6;
 int segT[4194305],//2^(ceil(logN)+1) + 1
 lucky[2000001];
-void insert(int val,int node=1,int l=1,int r=4)
+void insert(int val,int node=1,int l=1,int r=N)
 {
     if(l==r)
     {
@@ -164,7 +164,7 @@ void insert(int val,int node=1,int l=1,int r=4)
     segT[node]=segT[node<<1]+segT[node<<1|1];
 }
 
-void delkTh(int kTh,int node=1,int l=1,int r=4)
+void delkTh(int kTh,int node=1,int l=1,int r=N)
 {
     if(l==r)
     {
@@ -178,7 +178,7 @@ void delkTh(int kTh,int node=1,int l=1,int r=4)
         delkTh(kTh-segT[node<<1],node<<1|1,mid+1,r);
     segT[node]=segT[node<<1]+segT[node<<1|1];
 }
-int getkTh(int kTh,int node=1,int l=1,int r=4)
+int getkTh(int kTh,int node=1,int l=1,int r=N)
 {
     if(l==r)
         return l;
@@ -204,27 +204,26 @@ int main()
         {
             delkTh(idx_rem);
             idx_rem+=cur-1;
-            available++;
+            available--;
         }
     }
     int x;
     while(cin>>x)
     {
         bool flag=true;
-        if(x%2!=0)//all lucky numbers are odd (we delete even in first step) and the sum of 2 odds is even. so if x is odd the answer is no.
+        if(x%2==0)//all lucky numbers are odd (we delete even in first step) and the sum of 2 odds is even. so if x is odd the answer is no.
         {
             int m=x/2;
             for(int i=m;i>=1;i--)
                 if(lucky[i]&&lucky[x-i])
                 {
-                    cout<<x<<" is the sum of "<<i<<" and "<<x-i<<endl;
+                    cout<<x<<" is the sum of "<<i<<" and "<<x-i<<'.'<<endl;
                     flag=false;
                     break;
-                }        
+                }
         }
         if(flag)
             cout<<x<<" is not the sum of two luckies!"<<endl;
     }
     return 0;
 }
-
