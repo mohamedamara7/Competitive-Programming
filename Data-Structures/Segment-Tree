@@ -52,6 +52,7 @@ private:
             return 0;
         if(l>=i&&r<=j)
             return segT[node];
+        propagate(node,l,r);
         int mid= l+r>>1;
         return query(node<<1,l,mid,i,j)+query(node<<1|1,mid+1,r,i,j);
     }
@@ -61,8 +62,8 @@ private:
         lazy[node<<1]+=lazy[node];
         lazy[node<<1|1]+=lazy[node];
 
-        segT[node<<1]=(lazy[node])*(mid-l+1);
-        segT[node<<1|1]=(lazy[node])*(r-mid);
+        segT[node<<1]+=(lazy[node])*(mid-l+1);
+        segT[node<<1|1]+=(lazy[node])*(r-mid);
         lazy[node]=0;
     }
     void updateRange(int node,int l,int r,int i,int j,int val)
