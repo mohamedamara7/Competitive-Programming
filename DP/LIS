@@ -62,9 +62,16 @@ element for example the result should be 3 2 1 1 we can see that lis in this cas
 need to change the okey function in BS to <.
 
 
-3-Using segment tree in O(nlogn): The internal loop in the DP solution (first job) was looping from index 0 to cur_idx-1 (second job) takes the value the max value for
-an element the less than the current we can do the same thing using a segment tree. We will sort element ascendingly (second job) and maintaing it's original idx, 
-looping on the new sorted array and at each element the LIS will be ST.query(1,orginal index of current element-1)+1 (first job). We will use range max query.
+3-Using segment tree in O(nlogn): There're 2 methods
+A: Let a[] be the given array, and d[] be the array defined earlier. Suppose we are at a[i]. What is the LIS that ends with a[i]? The element before the last should be
+less than a[i]. Let that element be value. Now at d[value] is the length of the LIS that ends with value. So we should update d[a[i]] with d[value] + 1, if it is 
+greater than d[a[i]]. So we search for the maximum d[value] where value is less than a[i]. That is why we can use BIT and segment tree to calculate the maximum on a 
+prefix d[minValue;a[i] - 1]. But this method requires space at least O(Max_Value) and we need to handle negative numbers if there's.
+https://codeforces.com/contest/340/submission/4386727
+
+B: If we take array elements in an ascending order then using dp array like this dp[i] = answer (i is some position 1 to N) N is the number of elements at input , at 
+any step there will be only less than current value at left that already updated. so we call max_query(1 , i-1). So we need to sort and maintain the orginal index
+to query from 1 to idx-1.
 
 #include <bits/stdc++.h>
 #define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
