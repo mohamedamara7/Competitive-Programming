@@ -78,8 +78,8 @@ private:
         }
         propagate(node,l,r);
         int mid= l+r>>1;
-        updateRange(node,l,mid,i,j,val);
-        updateRange(node,mid+1,r,i,j,val);
+        updateRange(node<<1,l,mid,i,j,val);
+        updateRange(node<<1|1,mid+1,r,i,j,val);
         segT[node]=segT[node<<1]+segT[node<<1|1];
     }
 public:
