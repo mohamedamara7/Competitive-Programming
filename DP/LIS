@@ -117,7 +117,7 @@ bool comp(const pair<int,int>& l,const pair<int,int>& r)
 {
     if(l.first!=r.first)
         return r.first>l.first;
-    return r.second>l.second;
+    return r.second<l.second; //less than if we want strictly increasing subsequence
 }
 int main()
 {
@@ -129,14 +129,9 @@ int main()
         p[i]={v[i],i+1};
     sort(p.begin(),p.end(),comp);
     SegTree ST(n);
-    unordered_set<int>s;
     for(int i=0;i<n;i++)
     {
-        if(s.find(p[i].first)==s.end())
-        {
-            ST.set(p[i].second,ST.query(1,p[i].second-1)+1);
-            s.insert(p[i].first);
-        }
+        ST.set(p[i].second,ST.query(1,p[i].second-1)+1);
     }
     cout<<ST.query(1,n+1);
     return 0;
