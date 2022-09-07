@@ -251,18 +251,24 @@ int query(int s = 0, int e = MAX, int p = 1) {
  * 		Let a node represent 2 numbers: Opened, closed
  * 			# of Opened brackets that need a close
  * 			# of closed brackets that need an open
- *
+ *			Size of the segment to calc number of valid brackets ((size-(open+closed))/2)
  * 			E.g. is interval is ())(()( it will have value: 2, 1
  *
  * 		In query, how to merge 2 nodes:
- * 			The close of 2nd matches some of open of 1st. closed of 1st and opened of 2nd will not be matched
- *
- * 				Node P() = (p2.OPENED, p1.CLOSED);
+ *				# of Opened brackets for the parent intialy should equald # of Opened brackets for p2 not p1(because opened of p1 can match closed of 
+ *				p2).
+ *				# of closed brackets for the parent intialy should equald # of closed brackets for p1 not p2(because closed of p2 can match open of 
+ *				p2).
+ *				Then we should calc dif= p1.OPENED - p2.CLOSED; which determines if we need to increase the opened of parent or the closed.
+ 
+ 
+ * 				Node P() = (p2.OPENED, p1.CLOSED,0);
  *				int dif = p1.OPENED - p2.CLOSED;
  *				if(dif >= 0)
  *					P.OPENED += dif;
  *				else
  *					P.CLOSED -= dif;
+ *				P.len=p1.len+p2.len;
  *
  *		If query interval has value (0, 0), we have a balanced interval
  */
