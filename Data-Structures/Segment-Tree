@@ -136,6 +136,10 @@ int main()
     return 0;
 }
 
+Notes on lazy propagation:
+1- If we update a range for minimum or maximum we will update by the new value only not (r-l+1)*val. https://codeforces.com/problemset/problem/52/C
+2- If we want to make range update and xor query we will work on the bits itself if the maxBits=20, each node on the segment tree will contain 20 position for each bit
+and propagate over them using XOR. https://codeforces.com/problemset/problem/242/E
 
 -We can use segment tree in other things not only range query. In uva 10909 we want a data structure that can insert and remove element by its orginal position and get
 element by its orginal position and keep updating these position after removing and all these operations should be done by maximum in O(logN). But the elements are 
