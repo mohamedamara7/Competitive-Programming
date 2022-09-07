@@ -1,0 +1,7 @@
+Assume we have an array and we want to find number of elements which are smaller than k if we sort the array we can use binary search to find the index of the element
+that greater than or equal me and this will be the answer. If we have queries of variant segments we can use segment tree by the same style, the node will consist of a
+sorted vector and we can make a binary search on it. This segment tree is called Merge sort tree(MST). We can also find Kth smallest number in range L to R by the same 
+method using another binary search on the the range of numbers.
+https://discuss.codechef.com/t/merge-sort-tree-tutorial/14277
+https://leetcode.com/submissions/detail/793740140/
+https://codeforces.com/problemset/problem/459/D
