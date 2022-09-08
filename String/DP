@@ -1,0 +1,52 @@
+1-  String Alignment (Edit Distance):
+You have 2 strings A,B and we want to calc the score of converting string A to B using a set of operations. Assume the set of opertions are (replace a char in A - delete
+a char from A - insert a char in A). We will deal with tha same strings at the same time as we want to compare them so we will have a pointer for each one of them i,j.
+We can represent the 3 operations as:
+  1- replace a char in A: dp(i+1,j+1)
+  2- delete a char from A: dp(i+1,j)
+  3- insert a char in A: dp(i,j+1)
+and if we find that A[i]=B[j] then we should process the remaining of them using dp(i+1,j+1). Our base case is reaching the end of any of them if we reach the end of A
+and B still have some elements this means that we should add to A the remaining elements in B:
+if(i>=s.size())
+        return t.size()-j;
+and if we reach the end of B and A still have some elements this means that we should delete from A the remaining elements:
+if(j>=t.size())
+        return s.size()-i;
+Example: https://codeforces.com/contest/56/problem/D
+
+2-LCS:
+The same idea of 2 string as String Alignment. In LCS we make take or leave but on 2 strings at the same time. abdc       abc
+                                                                                                               1101       111
+so we have 3 choices: 
+1-Take Take: when the crosponding characters are the same. 1+dp(i+1,j+1)
+if the crosponding characters aren't the same:
+2-Take leave: dp(i,j+1)
+3-leave Take: dp(i+1,j)
+
+int LCS(int i,int j) //Calling with LCS(0,0)
+{
+    if(i>=s.size()||j>=t.size())
+        return 0;
+    if(s[i]==t[j])
+        return 1+LCS(i+1,j+1);
+    return max(LCS(i,j+1),LCS(i+1,j));
+}
+
+3-Longest Palindromic Subsequence:
+The problem asks for the longest palindrome that you can make from a string by deleting zero or more characters. It's a take or leave problem but with some 
+modifications for the palindrome. As we solve a palindrome problem we will have 2 pointers one for the start and the other for the end and we will take only if
+s[i]=s[j] and we can leave from the start of from the end dp(i+1,j),dp(i,j-1).
+https://leetcode.com/problems/longest-palindromic-subsequence/
+
+4-Longest Palindromic Substring:
+Now we need a contiguous element so we can't use take or leave technique but we can find for any range i,j if the string is palindrome or no and we can take the maximum
+range. We can use bottom up approach to fill the full table and take the max answer from it. We can have 2 pointers one for the start and the other for the end the 
+reccurence is:
+if(a[i]==a[j]&&palindrome[i+1][j-1]) palindrome[i][j]=true;
+and the base case is:
+if(i==j) palindrome[i][j]=true;  // Any single character is palindrome
+https://leetcode.com/submissions/detail/759621615/
+
+There's another iterative technique for this problem called expand arround the center. We will make each element as our center and we will iterate from it's left and
+right and get the maximum len of a palindrome string with this element as a center we should handel odd,even length palindromes.
+https://leetcode.com/submissions/detail/759745050/
