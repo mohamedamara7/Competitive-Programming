@@ -1,0 +1,16 @@
+General idea:
+  1-Store some info for each node.
+  2-Compute this info for the current node by combining the info of it with its children using dfs.
+The tree should always be rooted.
+
+int memo[int(2e5+1)];
+void dfs(int v,int par)
+{
+    memo[v]=0; //base case as v may be a leaf node
+    for(int i=0;i<adjList[v].size();i++)
+        if(adjList[v][i]!=par)
+        {
+            dfs(adjList[v][i],v); //calc the info for the children
+            memo[v]+=1+memo[adjList[v][i]]; //recurrence
+        }
+}
