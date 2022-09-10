@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+#define fastIO() do {ios::sync_with_stdio(0);cin.tie(0);cout.tie(0); } while (0)
+using namespace std;
+
+vector<vector<int>> adjList;
+int dp[int(2e5)+1][2];
+int ans=0;
+void dfs(int v,int par)
+{
+    dp[v][0]=dp[v][1]=0;
+    if(adjList[v].size()==0||(adjList[v].size()==1&&adjList[v][0]==par))
+        return;
+    vector<int> all;
+    for(int i=0;i<adjList[v].size();i++)
+        if(adjList[v][i]!=par)
+        {
+            dfs(adjList[v][i],v);
+            all.push_back(dp[adjList[v][i]][0]);
+        }
+    sort(all.rbegin(),all.rend());
+    if(all.size()==1)
+    {
+        dp[v][0]=1+all[0];
+        dp[v][1]=0;
+    }
+    else
+    {
+        dp[v][0]=1+all[0];
+        dp[v][1]=2+all[0]+all[1];
+    }
+    ans=max({ans,dp[v][0],dp[v][1]});
+}
+int main(){
+    fastIO();
+    int n,x,y;
+    cin>>n;
+    adjList=vector<vector<int>>(n);
+    for(int i=1;i<n;i++)
+    {
+        cin>>x>>y;
+        x--,y--;
+        adjList[x].push_back(y);
+        adjList[y].push_back(x);
+    }
+    dfs(0,-1);
+    cout<<ans;
+    return 0;
+}
