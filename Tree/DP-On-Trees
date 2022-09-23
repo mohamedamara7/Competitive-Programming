@@ -25,7 +25,8 @@ Common dp States:
 1- 
 The max length between 2 nodes like the tree diameter. The dp state is dp[u][0],dp[u][1] where dp]u][0] is the max distance between any 2 nodes in the subtree of u such
 that this path contains u and ends at u and dp[u][1] is the max distance between any 2 nodes in the subtree of u such that this path contains u and u isn't an endpoint.
-Notice the max distance may be at any node not anly node 1 so we mantain a variable ans that maximize the answer at any node.
+Notice the max distance may be at any node not anly node 1 so we mantain a variable ans that maximize the answer at any node and you should handle a special case if
+the node has only one child.
 
 Recurrence:
 dp[u][0]=1+max(dp[child][0])
