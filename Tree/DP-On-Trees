@@ -1,7 +1,7 @@
+Src: https://www.youtube.com/playlist?list=PLzVLIdIx9dQxCKaiktxELrtXtnItgAAIr
 General idea:
   1-Store some info for each node.
   2-Compute this info for the current node by combining the info of it with its children using dfs.
-The tree should always be rooted.
 
 int memo[int(2e5+1)];
 void dfs(int v,int par)
@@ -14,3 +14,22 @@ void dfs(int v,int par)
             memo[v]+=1+memo[adjList[v][i]]; //recurrence
         }
 }
+
+Notes:
+  1- We always root the tree around a certain node assume it's node 1.
+  2- We calculate the dp state of u for the subtree of u.
+  3- We calculate the base case for the leaf nodes.
+
+Common dp States:
+
+1- 
+The max length between 2 nodes like the tree diameter. The dp state is dp[u][0],dp[u][1] where dp]u][0] is the max distance between any 2 nodes in the subtree of u such
+that this path contains u and ends at u and dp[u][1] is the max distance between any 2 nodes in the subtree of u such that this path contains u and u isn't an endpoint.
+Notice the max distance may be at any node not anly node 1 so we mantain a variable ans that maximize the answer at any node.
+
+Recurrence:
+dp[u][0]=1+max(dp[child][0])
+dp[u][1]=2+max(dp[child][0])+secondMax(dp[child][0]) or 0 if u has only one child.
+Base case:
+dp[leaf][0]=dp[leaf][1]=0
+https://cses.fi/problemset/result/4600527/
