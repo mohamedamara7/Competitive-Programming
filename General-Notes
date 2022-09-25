@@ -13,3 +13,8 @@ it's the same as applying prefix sum on the new array.
 a constant time and loop over the set and at each number we will search for (k-num) in the data structure, we also can iterate until k/2 but now we should search for both
 idx,k-idx. we may use unordered set or map or even a boolean vector. Some times the numbers are sorted incresingly and we want l2-l1 to be minimize so we should loop from
 the idx=size/2 to 0 (not the opposite).
+
+-If we are calculating something for a subarray prefix sum is a common technique so think in it first. Sometimes we can convert O(N^2) of a prefix sum that count something
+to O(N) using an unordered map and the following relation: SubarraySum[l..r]=pref[r]-pref[l-1]
+https://leetcode.com/problems/subarray-sum-equals-k/
+https://leetcode.com/problems/subarray-sums-divisible-by-k/
