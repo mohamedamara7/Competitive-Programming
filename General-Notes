@@ -22,3 +22,10 @@ https://leetcode.com/problems/subarray-sums-divisible-by-k/
 -Sometimes we can reduce the complixety of dp solution for divisiblity problem by make use of pigeonhole principle
 The idea: https://www.youtube.com/watch?v=2leHFuMKr9o&ab_channel=MathXpress
 An example: https://codeforces.com/contest/577/problem/B
+
+-If we need to memomize a bool state:
+  1-In top down we can use an int memo or bool memo of a pair first for the answer and the second to check if it's visited before or note
+    https://codeforces.com/contest/577/submission/173518212
+  2-In bottom up we can use directly a bool table
+    https://codeforces.com/contest/577/submission/173519569
+
