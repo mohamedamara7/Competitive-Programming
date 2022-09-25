@@ -18,3 +18,7 @@ the idx=size/2 to 0 (not the opposite).
 to O(N) using an unordered map and the following relation: SubarraySum[l..r]=pref[r]-pref[l-1]
 https://leetcode.com/problems/subarray-sum-equals-k/
 https://leetcode.com/problems/subarray-sums-divisible-by-k/
+
+-Sometimes we can reduce the complixety of dp solution for divisiblity problem by make use of pigeonhole principle
+The idea: https://www.youtube.com/watch?v=2leHFuMKr9o&ab_channel=MathXpress
+An example: https://codeforces.com/contest/577/problem/B
