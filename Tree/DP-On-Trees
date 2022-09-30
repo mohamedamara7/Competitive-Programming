@@ -34,3 +34,8 @@ dp[u][1]=2+max(dp[child][0])+secondMax(dp[child][0]) or 0 if u has only one chil
 Base case:
 dp[leaf][0]=dp[leaf][1]=0
 https://cses.fi/problemset/result/4600527/
+
+2-
+When we want to calculate for each node a relation between it and all the other node in the tree like the sum of distance or the max distance we make 2 dfs.
+First one calculates this relation between the node and its subtree and some info that will be used in the 2nd dfs which calculates this relation but between
+this node and all nodes in the tree except its subtree as it's calculated before.
