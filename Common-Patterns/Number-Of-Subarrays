@@ -1,0 +1,35 @@
+As we have seen in maximum subarray there's another o(n) solution rather than kadane's algo which uses prefix sum as sum(l..r)=pref[r]-pref[l-1] so if we iterate on r we 
+should always have the minimum pre[l-1] and L always less than r. Remember we create prefix with size n+1 and the first element should be 0 to make the calculation
+easier.
+
+int n=nums.size(),mn_sofar=INT_MAX,mx=INT_MIN;
+//sum(l..r)=pre[r]-pre[l-1] we want to minimize pre[l-1]
+vector<int> pre(n+1,0);
+for(int i=0;i<n;i++)
+{
+    pre[i+1]=pre[i]+nums[i];
+    mn_sofar=min(mn_sofar,pre[i]);
+    mx=max(mx,pre[i+1]-mn_sofar);
+}
+return mx;
+
+Now, if we want to find number of subarrays where for example its sum equals k. We will use the same idea of prefix sum. sum(l..r)=pref[r]-pref[l-1]=k if we iterate over 
+r so we know pref[r] and pref[l-1]=pref[r]-k now we should find how many pref[l-1] we have and this number expresses the number of subarray ends at r and have sum equals
+k. We should have a map contains the cnt of each previous prefix(before r).
+
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        int n=nums.size(),pref=0,cnt=0;
+        unordered_map<int,int> prefix_cnt;
+        prefix_cnt[0]++;
+        for(int i=0;i<n;i++)
+        {
+            pref+=nums[i];
+            if(prefix_cnt.find(pref-k)!=prefix_cnt.end())
+                cnt+=prefix_cnt[pref-k];
+            prefix_cnt[pref]++;
+        }
+        return cnt;
+    }
+};
