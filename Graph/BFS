@@ -63,7 +63,7 @@ vector<int> bfs(int src,vector<vector<int>>& adjlist)
             for(int i=0;i<adjlist[cur_node].size();i++)
                 if(len[adjlist[cur_node][i]]==INT_MAX)
                 {
-                    q.push({adjlist[cur_node][i],cur_depth+1});
+                    q.push(adjlist[cur_node][i]);
                     len[adjlist[cur_node][i]]=cur_depth+1;
                 }
         }
@@ -96,7 +96,7 @@ vector<int> bfs(int src,int dst,vector<vector<int>>& adjlist)
             for(int i=0;i<adjlist[cur_node].size();i++)
                 if(len[adjlist[cur_node][i]]==INT_MAX)
                 {
-                    q.push({adjlist[cur_node][i],cur_depth+1});
+                    q.push(adjlist[cur_node][i]);
                     len[adjlist[cur_node][i]]=cur_depth+1;
                     par[adjlist[cur_node][i]]=cur_node;
                 }
